@@ -1,0 +1,32 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug Arcanoid",
+            "type": "cppdbg",
+            "request": "launch",
+            
+            // This magic variable asks CMake Tools for the exact path to Sandbox.exe
+            "program": "${command:cmake.launchTargetPath}",
+            "args": [],
+            "stopAtEntry": false,
+            
+            // Forces the game to run from the root MyEngine/ folder
+            // so relative paths like "assets/shaders/..." work later.
+            "cwd": "${workspaceFolder}",
+            
+            "environment": [],
+            "externalConsole": false,
+            
+            // Tells VS Code to use GDB (MinGW's debugger)
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
+        }
+    ]
+}
