@@ -19,7 +19,7 @@ class GameObject {
 
         void setMesh(const std::shared_ptr<Mesh>& mesh);
         void setTransform(const glm::mat4& transform);
-        const glm::mat4& getTransform() const { return m_transform; };
+        glm::mat4 getTransform() const;
 
         std::shared_ptr<Mesh> getMesh() const;
         void draw();

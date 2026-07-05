@@ -20,11 +20,20 @@ void Application::Run() {
     while (m_Running && !m_Window->ShouldClose()) {
         // Calculate Delta Time
         auto currentTime = std::chrono::steady_clock::now();
-        double deltaTime = std::chrono::duration(currentTime - lastTime).count();
+        double deltaTime = std::chrono::duration<double>(currentTime - lastTime).count(); // Convert to seconds
         lastTime = currentTime;
 
-        // 2. Call the Sandbox update hook
-        OnUpdate(deltaTime);
+        if(deltaTime > 0.25) {
+            deltaTime = 0.25; //Limita deltaTime (espiral de la muerte)
+        }
+
+        // 2. Fijo a FPS 
+        accumulator += deltaTime;
+
+        if (accumulator >= timePerFrame) {
+            OnUpdate(timePerFrame); //
+            accumulator -= timePerFrame;
+        }
 
         // Clear the screen
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
