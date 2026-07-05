@@ -11,3 +11,11 @@ Camera::Camera(glm::vec3 position, glm::vec3 up, float yaw, float pitch)
 glm::mat4 Camera::getViewMatrix() {
     return glm::lookAt(position, position + front, up);
 }
+
+void Camera::setPosition(const glm::vec3& position) {
+    this->position = position;
+}
+
+glm::vec3 Camera::getPosition() const {
+    return position;
+}

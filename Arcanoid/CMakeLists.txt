@@ -1,7 +1,7 @@
 project(Arcanoid)
 
 # Find all Arcanoid source files
-file(GLOB_RECURSE ARCANOID_SOURCES "src/*.cpp" "src/*.h")
+file(GLOB_RECURSE ARCANOID_SOURCES CONFIGURE_DEPENDS "src/*.cpp" "src/*.h")
 
 # Create the executable
 add_executable(Arcanoid ${ARCANOID_SOURCES})

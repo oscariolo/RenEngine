@@ -4,6 +4,9 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
+#include <filesystem>
+
+namespace fs = std::filesystem;
 
 //si no se pasa ningun path, se toma el shader por defecto
 Shader::Shader() : Shader("assets/shaders/base/vertex.vert", "assets/shaders/base/fragment.frag") {};
@@ -56,7 +59,25 @@ void Shader::Unbind() const {
 }
 
 std::string Shader::ReadFile(const std::string& filepath) {
-    std::ifstream file(filepath);
+    fs::path selectedPath = filepath;
+
+    if (!fs::exists(selectedPath)) {
+        fs::path current = fs::current_path();
+        for (int i = 0; i < 8; ++i) {
+            fs::path candidate = current / filepath;
+            if (fs::exists(candidate)) {
+                selectedPath = candidate;
+                break;
+            }
+
+            if (!current.has_parent_path()) {
+                break;
+            }
+            current = current.parent_path();
+        }
+    }
+
+    std::ifstream file(selectedPath);
     if (!file.is_open()) {
         std::cerr << "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ: " << filepath << std::endl;
         return "";

@@ -26,6 +26,9 @@ void Renderer::submit(const std::shared_ptr<Shader>& shader, const std::shared_p
     shader->SetMat4("model", gameObject->getTransform());
     shader->SetMat4("view", m_Camera->getViewMatrix());
     shader->SetMat4("projection", m_ProjectionMatrix);
+    shader->SetVec3("lightPos", glm::vec3(1.5f, 1.5f, 2.0f));
+    shader->SetVec3("viewPos", m_Camera->getPosition());
+    shader->SetVec3("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
 
     gameObject->draw();    
 
