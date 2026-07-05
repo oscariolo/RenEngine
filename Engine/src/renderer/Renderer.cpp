@@ -30,6 +30,7 @@ void Renderer::submit(const std::shared_ptr<Shader>& shader, const std::shared_p
 
     shader->SetMat4("model", gameObject->getTransform());
     shader->SetMat4("view", m_Camera->getViewMatrix());
+    shader->SetVec3("cameraPos", m_Camera->getPosition());
     shader->SetMat4("projection", m_ProjectionMatrix);
 
     if(m_PointLights.size() > 0){

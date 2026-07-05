@@ -7,12 +7,12 @@ in vec3 Normal;
 in vec3 FragPos;
 in vec3 ourColor;  
   
-uniform vec3 viewPos; 
+uniform vec3 cameraPos; 
 uniform vec3 lightColor = vec3(1.0, 1.0, 1.0);
 
 uniform float ambientStrength = 0.6;
 uniform float specularStrength = 0.5;
-uniform float shininess = 32.0;
+uniform float shininess = 500.0;
 uniform int numLights = 0;
 
 struct PointLight{
@@ -28,9 +28,9 @@ vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir);
 
 void main()
 {
-    
+    FragColor = vec4(0.0, 0.0, 0.0, 1.0);
     vec3 norm = normalize(Normal);
-    vec3 viewDir = normalize(viewPos - FragPos);
+    vec3 viewDir = normalize(cameraPos - FragPos);
     if(numLights == 0)
     {
         FragColor = vec4(ambientStrength * lightColor, 1.0);
