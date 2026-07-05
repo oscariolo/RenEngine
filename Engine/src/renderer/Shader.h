@@ -6,6 +6,7 @@
 class Shader {
 public:
     // Pass the full relative path, e.g., "assets/shaders/lighting.vert"
+    Shader();
     Shader(const std::string& vertexPath, const std::string& fragmentPath);
     ~Shader();
 

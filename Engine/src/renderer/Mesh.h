@@ -6,15 +6,18 @@ class Mesh{
 
     public:
         Mesh();
-        ~Mesh();
+        virtual ~Mesh();
 
         void generateVertices();
+        std::vector<Vertex> getVertices() const;
+        std::vector<unsigned int> getIndices() const;
+        unsigned int VAO_ID, VBO_ID, EBO_ID;
 
         std::vector<Vertex> vertices;
         std::vector<unsigned int> indices;
-        unsigned int ID;
-        
-        std::vector<Vertex> getVertices() const;
-        std::vector<unsigned int> getIndices() const;
+    
+    protected:
+
+        void setupBuffers();
 
 };

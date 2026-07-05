@@ -2,25 +2,26 @@
 #include "Shader.h"
 #include "Camera.h"
 #include <memory>
-#include <Mesh.h>
+#include "Mesh.h"
+#include "GameObject.h"
+#include <glm/glm.hpp>
 
 class Renderer {
 
     public:
-        Renderer();
-        ~Renderer();
+        static void init();
 
         static void setCamera(Camera& camera);
         //genera los buffers y los prepara para dibujar
-        static void submit(const std::shared_ptr<Shader>& shader, const std::shared_ptr<Mesh>& mesh, const glm::mat4& transform); 
-        
+        static void submit(const std::shared_ptr<Shader>& shader, const std::shared_ptr<GameObject>& gameObject); 
 
         //dibuja todo los objetos que se han enviado al renderer
         static void draw();
 
         static void Clear();
-    
-    private:
+        
+        static Camera* m_Camera;
+        static glm::mat4 m_ProjectionMatrix;
         
     
 };

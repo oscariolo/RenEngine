@@ -7,5 +7,6 @@ struct Vertex{
     glm::vec3 color;
 
     Vertex(const glm::vec3& pos, const glm::vec3& norm, const glm::vec3& col);
+    Vertex(float x, float y, float z);
 
 };

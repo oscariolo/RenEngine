@@ -11,6 +11,7 @@ uniform mat4 projection = mat4(1.0);
 
 out vec3 FragPos;
 out vec3 Normal;
+out vec3 ourColor;
 
 
 void main()
@@ -19,5 +20,4 @@ void main()
     Normal = mat3(transpose(inverse(model))) * aNormal;
     gl_Position = projection * view * model * vec4(aPos, 1.0);
     ourColor = aColor;
-
 }

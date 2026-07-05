@@ -12,6 +12,7 @@ void Application::Run() {
     std::cout << "Engine starting...\n";
     
     //Inicializacion
+    glEnable(GL_DEPTH_TEST);
     OnInit(); 
 
     auto lastTime = std::chrono::steady_clock::now();

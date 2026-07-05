@@ -5,6 +5,9 @@
 #include <sstream>
 #include <iostream>
 
+//si no se pasa ningun path, se toma el shader por defecto
+Shader::Shader() : Shader("assets/shaders/base/vertex.vert", "assets/shaders/base/fragment.frag") {};
+
 Shader::Shader(const std::string& vertexPath, const std::string& fragmentPath) {
     // 1. Retrieve the vertex/fragment source code from filePath
     std::string vertexCode = ReadFile(vertexPath);
