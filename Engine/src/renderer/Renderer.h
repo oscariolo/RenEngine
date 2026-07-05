@@ -5,6 +5,7 @@
 #include "Mesh.h"
 #include "GameObject.h"
 #include <glm/glm.hpp>
+#include "PointLight.h"
 
 class Renderer {
 
@@ -12,6 +13,7 @@ class Renderer {
         static void init();
 
         static void setCamera(Camera& camera);
+        static void addPointLight(const PointLight& pointLight);
         //genera los buffers y los prepara para dibujar
         static void submit(const std::shared_ptr<Shader>& shader, const std::shared_ptr<GameObject>& gameObject); 
 
@@ -22,6 +24,7 @@ class Renderer {
         
         static Camera* m_Camera;
         static glm::mat4 m_ProjectionMatrix;
+        static std::vector<PointLight> m_PointLights;
         
     
 };

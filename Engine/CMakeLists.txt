@@ -1,7 +1,7 @@
 project(Engine)
 
 # Recursively find all C++ and Header files in Engine/src
-file(GLOB_RECURSE ENGINE_SOURCES "src/*.cpp" "src/*.h")
+file(GLOB_RECURSE ENGINE_SOURCES CONFIGURE_DEPENDS "src/*.cpp" "src/*.h")
 
 # Include the GLAD C file so it gets compiled into the engine
 set(GLAD_SOURCE "${CMAKE_SOURCE_DIR}/vendor/glad/src/glad.c")

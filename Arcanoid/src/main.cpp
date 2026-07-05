@@ -26,7 +26,11 @@ protected:
         Renderer::setCamera(camera);
         shader = std::make_shared<Shader>();
 
-        gameobject = std::make_shared<GameObject>(std::make_shared<Cube>());        
+        PointLight pointLight;
+        pointLight.position = glm::vec3(1.2f, 1.0f, 2.0f);
+        Renderer::addPointLight(pointLight);
+
+        gameobject = std::make_shared<GameObject>(std::make_shared<Sphere>());
 
 
 
@@ -38,7 +42,9 @@ protected:
     }
 
     void OnUpdate(double deltaTime) override {
-        gameobject->position.x += 1.0f * deltaTime; // Rotate 50 degrees per second around the Y-axis
+        // gameobject->position.x += 1.0f * deltaTime; // Rotate 50 degrees per second around the Y-axis
+        gameobject->rotation.y += 50.0f * deltaTime; // Rotate 50 degrees per second around the Y-axis
+
     }
 
     void OnRender() override {
