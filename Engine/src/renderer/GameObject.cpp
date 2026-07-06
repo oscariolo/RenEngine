@@ -1,10 +1,9 @@
 #include "GameObject.h"
-#include <glad/glad.h>
-#include <glm/gtc/matrix_transform.hpp>
+#include "physics/PhysicsEngine.h"
 
 
 GameObject::GameObject(){
-    m_transform = glm::mat4(1.0f);
+    
 }
 
 GameObject::~GameObject() {
@@ -15,7 +14,7 @@ GameObject::GameObject(const std::shared_ptr<Mesh>& mesh) : m_Mesh(mesh) {
 
 }
 
-void GameObject::setMesh(const std::shared_ptr<Mesh>& mesh) {
+void GameObject::setMesh(const std::shared_ptr<Mesh>& mesh) {   
     m_Mesh = mesh;
 
 }
@@ -34,11 +33,21 @@ glm::mat4 GameObject::getTransform() const {
     // 3. Scale
     transform = glm::scale(transform, scale);
 
-    // Update the member variable m_transform
     
     return transform; 
 };
 
+void GameObject::setPosition(float x, float y, float z){
+    position.x = x;
+    position.y = y;
+    position.z = z;
+}
+
+void GameObject::update(){
+
+}
+
+//solo dibuja el objeto, no actualiza nada
 void GameObject::draw() {
     // Bind VAO and draw the mesh
     glBindVertexArray(m_Mesh->VAO_ID);

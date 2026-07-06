@@ -4,3 +4,4 @@
 #include "renderer/Cube.h"
 #include "renderer/Sphere.h"
 #include "renderer/Camera.h"
+#include "renderer/PhysicsObject.h"

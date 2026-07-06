@@ -6,6 +6,8 @@ file(GLOB_RECURSE ENGINE_SOURCES CONFIGURE_DEPENDS "src/*.cpp" "src/*.h")
 # Include the GLAD C file so it gets compiled into the engine
 set(GLAD_SOURCE "${CMAKE_SOURCE_DIR}/vendor/glad/src/glad.c")
 
+add_subdirectory("${CMAKE_SOURCE_DIR}/vendor/reactphysics3d" "${CMAKE_BINARY_DIR}/vendor/reactphysics3d")
+
 # Create the static library
 add_library(Engine STATIC ${ENGINE_SOURCES} ${GLAD_SOURCE})
 
@@ -16,6 +18,7 @@ target_include_directories(Engine PUBLIC
     "${CMAKE_SOURCE_DIR}/vendor/glfw/include"
     "${CMAKE_SOURCE_DIR}/vendor/glad/include"
     "${CMAKE_SOURCE_DIR}/vendor/glm"
+    "${CMAKE_SOURCE_DIR}/vendor/reactphysics3d/include"
 )
 
 # Find system OpenGL
@@ -25,4 +28,6 @@ find_package(OpenGL REQUIRED)
 target_link_libraries(Engine PUBLIC 
     "${CMAKE_SOURCE_DIR}/vendor/glfw/lib/libglfw3dll.a"
     OpenGL::GL
+    reactphysics3d
 )
+
