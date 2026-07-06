@@ -6,6 +6,7 @@ class PhysicsObject : public GameObject{
     private:
         rp3d::RigidBody* m_RigidBody;
         rp3d::Collider* m_collider;
+
     
     public:
         
@@ -15,8 +16,12 @@ class PhysicsObject : public GameObject{
         void setRigidBody(rp3d::RigidBody* rigidBody);
         void update()override;
         void setPosition(float x , float y, float z)override;
+        void setPosition(glm::vec3 position)override;
+        void setRotation(float x, float y, float z)override;
 
-        rp3d::RigidBody* getRigidBody() const;
+        rp3d::RigidBody* getRigidBody() const{
+            return m_RigidBody;
+        };
         glm::mat4 getTransform() const override;
         void addCollider(rp3d::CollisionShape* collider);
 

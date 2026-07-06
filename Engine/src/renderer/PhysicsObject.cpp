@@ -45,6 +45,19 @@ void PhysicsObject::update(){
     this->position.z = currentTransform.getPosition().z;
 }
 
+void PhysicsObject::setPosition(glm::vec3 position){
+    rp3d::Transform currentTransform = m_RigidBody->getTransform();
+    currentTransform.setPosition(rp3d::Vector3(position.x,position.y,position.z));
+    m_RigidBody->setTransform(currentTransform);
+}
+
+void PhysicsObject::setRotation(float x, float y, float z){
+    rp3d::Transform currentTransform = m_RigidBody->getTransform();
+    rp3d::Quaternion rotation = rp3d::Quaternion::fromEulerAngles(rp3d::Vector3(x,y,z));
+    currentTransform.setOrientation(rotation);
+    m_RigidBody->setTransform(currentTransform);
+}
+
 void PhysicsObject::addCollider(rp3d::CollisionShape* collisionShape){
     rp3d::Transform transform = rp3d::Transform::identity();
     m_collider = m_RigidBody->addCollider(collisionShape,transform);
