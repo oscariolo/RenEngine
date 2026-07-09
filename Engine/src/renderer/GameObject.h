@@ -43,7 +43,7 @@ class GameObject {
     public:
         std::shared_ptr<Mesh> m_Mesh;
         glm::vec3 scale = glm::vec3(1.0f, 1.0f, 1.0f);
-
+    
 
 
 

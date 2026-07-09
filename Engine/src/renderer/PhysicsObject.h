@@ -18,6 +18,7 @@ class PhysicsObject : public GameObject{
         void setPosition(float x , float y, float z)override;
         void setPosition(glm::vec3 position)override;
         void setRotation(float x, float y, float z)override;
+        void setMaterialProperties(float bounciness, float frictionCoefficient, float massDensity);
 
         rp3d::RigidBody* getRigidBody() const{
             return m_RigidBody;

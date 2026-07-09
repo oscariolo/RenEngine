@@ -62,3 +62,15 @@ void PhysicsObject::addCollider(rp3d::CollisionShape* collisionShape){
     rp3d::Transform transform = rp3d::Transform::identity();
     m_collider = m_RigidBody->addCollider(collisionShape,transform);
 }
+
+void PhysicsObject::setMaterialProperties(float bounciness, float frictionCoefficient, float massDensity){
+    if(m_collider){
+        rp3d::Material& material = m_collider->getMaterial();
+        material.setBounciness(bounciness);
+        material.setFrictionCoefficient(frictionCoefficient);
+        material.setMassDensity(massDensity);
+        m_RigidBody->setLinearDamping(0.0f); // Set linear damping to 0
+        m_RigidBody->setAngularDamping(0.0f); // Set angular damping to 0
+    }
+}
+
