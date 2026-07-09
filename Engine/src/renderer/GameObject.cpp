@@ -3,7 +3,7 @@
 
 
 GameObject::GameObject(){
-    
+    m_ID = generateUniqueID();
 }
 
 GameObject::~GameObject() {
@@ -11,7 +11,7 @@ GameObject::~GameObject() {
 }
 
 GameObject::GameObject(const std::shared_ptr<Mesh>& mesh) : m_Mesh(mesh) {
-
+    m_ID = generateUniqueID();
 }
 
 void GameObject::setMesh(const std::shared_ptr<Mesh>& mesh) {   
@@ -43,16 +43,14 @@ void GameObject::setPosition(float x, float y, float z){
     position.z = z;
 }
 
+
 void GameObject::update(){
 
 }
 
 //solo dibuja el objeto, no actualiza nada
 void GameObject::draw() {
-    // Bind VAO and draw the mesh
-    glBindVertexArray(m_Mesh->VAO_ID);
-    glDrawElements(GL_TRIANGLES, m_Mesh->getIndices().size(), GL_UNSIGNED_INT, 0);
-    glBindVertexArray(0);
+
 }
 
 

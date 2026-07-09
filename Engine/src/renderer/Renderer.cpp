@@ -24,7 +24,10 @@ void Renderer::addPointLight(const std::shared_ptr<PointLight>& pointLight) {
     m_PointLights.push_back(pointLight);
 }
 
-void Renderer::submit(const std::shared_ptr<Shader>& shader, const std::shared_ptr<GameObject>& gameObject) {
+void Renderer::submit(Shader* shader, GameObject* gameObject) {
+    if(!shader || !gameObject || !gameObject->m_Mesh) {
+        return;
+    }
     //Generate buffers and prepare them for drawing
     shader->Bind();
 
@@ -43,7 +46,10 @@ void Renderer::submit(const std::shared_ptr<Shader>& shader, const std::shared_p
         }
         shader->SetInt("numLights", static_cast<int>(m_PointLights.size()));
     }
-    gameObject->draw();    
+
+    glBindVertexArray(gameObject->m_Mesh->VAO_ID);
+    glDrawElements(GL_TRIANGLES, gameObject->m_Mesh->getIndices().size(), GL_UNSIGNED_INT, 0);
+    glBindVertexArray(0); 
 
 }
 

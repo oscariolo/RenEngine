@@ -15,7 +15,7 @@ class Renderer {
         static void setCamera(Camera& camera);
         static void addPointLight(const std::shared_ptr<PointLight>& pointLight);
         //genera los buffers y los prepara para dibujar
-        static void submit(const std::shared_ptr<Shader>& shader, const std::shared_ptr<GameObject>& gameObject); 
+        static void submit(Shader* shader, GameObject* gameObject); 
 
         //dibuja todo los objetos que se han enviado al renderer
         static void draw();

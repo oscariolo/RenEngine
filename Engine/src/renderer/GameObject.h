@@ -3,10 +3,9 @@
 #include "Mesh.h"
 #include <memory>
 #include <glm/glm.hpp>
-#include <reactphysics3d/reactphysics3d.h>
-#include <glad/glad.h>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp> 
+#include <atomic>
 
 class GameObject {
     public:
@@ -43,6 +42,15 @@ class GameObject {
     public:
         std::shared_ptr<Mesh> m_Mesh;
         glm::vec3 scale = glm::vec3(1.0f, 1.0f, 1.0f);
+    
+    private:
+        uint64_t generateUniqueID() {
+            static std::atomic<uint64_t> counter(0);
+            return ++counter;
+        }
+
+    protected:
+        uint64_t m_ID;
     
 
 

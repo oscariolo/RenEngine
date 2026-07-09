@@ -146,6 +146,18 @@ protected:
         // ANGULAR: 0 = Locked, 1 = Free. Prevent spinning on X and Y, allow spinning on Z.
         ball->getRigidBody()->setAngularLockAxisFactor(rp3d::Vector3(0.0f, 0.0f, 1.0f));
         ball->getRigidBody()->setLinearVelocity(rp3d::Vector3(0.0f, ballSpeed, 0.0f)); // Set initial velocity for the ball
+    
+        //logica de desaparicion de ladrillos
+
+        auto onBrickHit = [&](PhysicsObject* brick, PhysicsObject* ball) {
+            brick->queue_free(); // Mark the brick for deletion
+        };
+
+        for (const auto& brick : bricks) {
+            brick->onCollisionCallback(onBrickHit);
+        }
+
+    
     }
 
     void OnUpdate(double deltaTime) override {
@@ -169,17 +181,24 @@ protected:
         pointLight->setPosition(ball->getPosition().x, ball->getPosition().y, ball->getPosition().z);
 
         PhysicsEngine::update(static_cast<float>(timePerFrame));
+
+        bricks.erase(
+            std::remove_if(bricks.begin(), bricks.end(),
+                [](const std::shared_ptr<PhysicsObject>& brick){
+                    return brick->m_isQueuedForDeletion;
+                }),
+            bricks.end());
     }
 
     void OnRender() override {
         for (const auto& wall : walls) {
-            Renderer::submit(shader, wall);
+            Renderer::submit(shader.get(), wall.get());
         }
         for (const auto& brick : bricks) {
-            Renderer::submit(shader, brick);
+            Renderer::submit(shader.get(), brick.get());
         }
-        Renderer::submit(shader, ball);
-        Renderer::submit(shader, paddle);
+        Renderer::submit(shader.get(), ball.get());
+        Renderer::submit(shader.get(), paddle.get());
     }
 };
 

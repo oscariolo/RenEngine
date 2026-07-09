@@ -1,18 +1,18 @@
 #include "PhysicsObject.h"
 #include "physics/PhysicsEngine.h"
 
-PhysicsObject::PhysicsObject(const std::shared_ptr<Mesh>& mesh, rp3d::BodyType type) : GameObject(mesh) {
+PhysicsObject::PhysicsObject(const std::shared_ptr<Mesh>& mesh, rp3d::BodyType type) : GameObject(mesh)  {
     rp3d::Vector3 position(this->position.x, this->position.y, this->position.z);
     rp3d::Quaternion orientation = rp3d::Quaternion::identity();
     rp3d::Transform transform(position, orientation);
     m_RigidBody = PhysicsEngine::createRigidBody(transform);
     PhysicsEngine::registerBody(this);
+    m_RigidBody->setUserData(this);
     m_RigidBody->setType(type);
 };
 
 PhysicsObject::~PhysicsObject() {
-    PhysicsEngine::physicsWorld->destroyRigidBody(m_RigidBody);
-    PhysicsEngine::unregisterBody(this);
+    
 }
 
 glm::mat4 PhysicsObject::getTransform() const {
@@ -72,5 +72,13 @@ void PhysicsObject::setMaterialProperties(float bounciness, float frictionCoeffi
         m_RigidBody->setLinearDamping(0.0f); // Set linear damping to 0
         m_RigidBody->setAngularDamping(0.0f); // Set angular damping to 0
     }
+}
+
+void PhysicsObject::setRigidBody(rp3d::RigidBody* rigidBody) {
+    m_RigidBody = rigidBody;
+}
+
+void PhysicsObject::queue_free() {
+    m_isQueuedForDeletion = true;
 }
 
