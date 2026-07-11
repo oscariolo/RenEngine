@@ -6,6 +6,7 @@
 #include <iostream>
 #include <random>
 #include <vector>
+#include "Brick.h"
 
 class SandboxApp : public Application {
 private:
@@ -24,7 +25,7 @@ private:
     // Raw observer pointers — PhysicsEngine owns the memory.
     PhysicsObject* ball   = nullptr;
     PhysicsObject* paddle = nullptr;
-    std::vector<PhysicsObject*> bricks;
+    std::vector<Brick*> bricks;
     std::vector<PhysicsObject*> walls;
 
 protected:
@@ -36,9 +37,13 @@ protected:
         timePerFrame = 1.0f / FPS;
         glEnable(GL_DEPTH_TEST);
 
-        camera = Camera(glm::vec3(0.0f, 0.0f, 5.5f),
+        camera = Camera(glm::vec3(1.0f, -3.0f, 2.5f),
                         glm::vec3(0.0f, 0.0f, 0.0f),
                         glm::vec3(0.0f, 1.0f, 0.0f));
+        
+        
+        
+
         Renderer::setCamera(camera);
         shader = std::make_shared<Shader>();
 
@@ -65,7 +70,7 @@ protected:
 
         // --- Ball ---
         ball = PhysicsEngine::spawn<PhysicsObject>(std::make_shared<Sphere>(), rp3d::BodyType::DYNAMIC);
-        ball->scale = glm::vec3(ballRadius * 2.0f);
+        ball->scale = glm::vec3(ballRadius * 2.5f);
         ball->addCollider(PhysicsEngine::physicsCommon.createSphereShape(ballRadius));
         ball->setMaterialProperties(1.0f, 0.0f, 1.0f);
         ball->getRigidBody()->enableGravity(false);
@@ -108,7 +113,7 @@ protected:
 
         for(int row = 0; row < brickRows; ++row){
             for(int col = 0; col < brickColumns; ++col){
-                auto* brick = PhysicsEngine::spawn<PhysicsObject>(std::make_shared<Cube>(), rp3d::BodyType::STATIC);
+                auto* brick = PhysicsEngine::spawn<Brick>(std::make_shared<Cube>(), rp3d::BodyType::STATIC);
                 brick->scale = glm::vec3(brickWidth, brickHeight, brickDepth);
                 brick->addCollider(PhysicsEngine::physicsCommon.createBoxShape(
                     rp3d::Vector3(brickWidth*0.5f, brickHeight*0.5f, brickDepth*0.5f)));
@@ -118,7 +123,7 @@ protected:
                     startY - row*(brickHeight + vSpacing),
                     0.0f);
                 brick->onCollisionCallback([](PhysicsObject* self, PhysicsObject*){
-                    self->queue_free();
+                    static_cast<Brick*>(self)->killBrick();
                 });
                 bricks.push_back(brick);
             }
@@ -146,20 +151,22 @@ protected:
         currentPosition.x = std::max(-maxPaddleX, std::min(maxPaddleX, currentPosition.x));
         
         paddle->setPosition(currentPosition);
+        ball->getRigidBody()->setAngularVelocity(rp3d::Vector3(0, 0, 3.0f * currentPosition.x));
     }
 
     void OnUpdate(double deltaTime) override {
         m_Accumulator += deltaTime;
-        if(m_Accumulator >= 1.25){
-            m_Accumulator = 0.0;
-            const rp3d::Vector3 vel    = ball->getRigidBody()->getLinearVelocity();
-            const float         hSpeed = std::abs(static_cast<float>(vel.x));
-            const float         rnd    = std::uniform_real_distribution<float>(0,1)(m_RandomEngine);
-            if(hSpeed < 0.75f || rnd < 0.35f){
-                const float dir = (std::uniform_real_distribution<float>(0,1)(m_RandomEngine) < 0.5f) ? -1.0f : 1.0f;
-                ball->getRigidBody()->setLinearVelocity(rp3d::Vector3(vel.x + dir*1.75f, vel.y, 0));
-            }
-        }
+        // if(m_Accumulator >= 1.25){
+        //     m_Accumulator = 0.0;
+        //     const rp3d::Vector3 vel    = ball->getRigidBody()->getLinearVelocity();
+        //     const float         hSpeed = std::abs(static_cast<float>(vel.x));
+        //     const float         rnd    = std::uniform_real_distribution<float>(0,1)(m_RandomEngine);
+        //     if(hSpeed < 0.75f || rnd < 0.35f){
+        //         const float dir = (std::uniform_real_distribution<float>(0,1)(m_RandomEngine) < 0.5f) ? -1.0f : 1.0f;
+        //         ball->getRigidBody()->setLinearVelocity(rp3d::Vector3(vel.x + dir*1.75f, vel.y, 0));
+        //     }
+        // }
+
 
         pointLight->setPosition(ball->getPosition().x, ball->getPosition().y, ball->getPosition().z);
 

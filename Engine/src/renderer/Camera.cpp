@@ -10,9 +10,9 @@ Camera::Camera(glm::vec3 position, glm::vec3 up, float yaw, float pitch)
 
 Camera::Camera(glm::vec3 position, glm::vec3 target, glm::vec3 up)
     : position(position), target(target), worldUp(up) {
-    front = glm::normalize(target - position);
-    right = glm::normalize(glm::cross(front, worldUp));
-    this->up = glm::normalize(glm::cross(right, front));
+    this->front = glm::normalize(target - position);
+    this->right = glm::normalize(glm::cross(this->front, worldUp));
+    this->up = glm::normalize(glm::cross(this->right, this->front));
 }
 
 glm::mat4 Camera::getViewMatrix() {
@@ -21,16 +21,16 @@ glm::mat4 Camera::getViewMatrix() {
 
 void Camera::setPosition(const glm::vec3& position) {
     this->position = position;
-    front = glm::normalize(target - this->position);
-    right = glm::normalize(glm::cross(front, worldUp));
-    up = glm::normalize(glm::cross(right, front));
+    this->front = glm::normalize(target - this->position);
+    this->right = glm::normalize(glm::cross(this->front, worldUp));
+    this->up = glm::normalize(glm::cross(this->right, this->front));
 }
 
 void Camera::setTarget(const glm::vec3& target) {
     this->target = target;
-    front = glm::normalize(this->target - position);
-    right = glm::normalize(glm::cross(front, worldUp));
-    up = glm::normalize(glm::cross(right, front));
+    this->front = glm::normalize(this->target - this->position);
+    this->right = glm::normalize(glm::cross(this->front, worldUp));
+    this->up = glm::normalize(glm::cross(this->right, this->front));
 }
 
 glm::vec3 Camera::getPosition() const {
