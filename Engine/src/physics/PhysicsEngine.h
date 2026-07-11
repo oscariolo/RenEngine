@@ -6,6 +6,13 @@ class PhysicsObject;
 
 class PhysicsEngine {
     public:
+        template<typename T, typename... Args>
+        static T* spawn(Args&&... args) {
+            auto obj = std::make_unique<T>(std::forward<Args>(args)...);
+            T* ptr = obj.get();
+            m_physicsObjects.push_back(std::move(obj));
+            return ptr;
+        }
         static void destroy();
         static void init();
         static void update(float deltaTime);
@@ -16,8 +23,8 @@ class PhysicsEngine {
 
         static rp3d::PhysicsCommon physicsCommon;
         static rp3d::PhysicsWorld* physicsWorld;
-        static std::vector<PhysicsObject*> m_physicsObjects; 
-    
+        static std::vector<std::unique_ptr<PhysicsObject>> m_physicsObjects;
+        static std::function<void(PhysicsObject*)> onBeforeDestroy;
 
 
 };

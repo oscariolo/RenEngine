@@ -6,7 +6,6 @@ PhysicsObject::PhysicsObject(const std::shared_ptr<Mesh>& mesh, rp3d::BodyType t
     rp3d::Quaternion orientation = rp3d::Quaternion::identity();
     rp3d::Transform transform(position, orientation);
     m_RigidBody = PhysicsEngine::createRigidBody(transform);
-    PhysicsEngine::registerBody(this);
     m_RigidBody->setUserData(this);
     m_RigidBody->setType(type);
 };
