@@ -12,6 +12,7 @@ public:
 protected:
     //Bucle para el juego y la logica del juego
     virtual void OnInit() {}
+    virtual void OnInput() {}
     virtual void OnUpdate(double deltaTime) {}
     virtual void OnRender() {}
 

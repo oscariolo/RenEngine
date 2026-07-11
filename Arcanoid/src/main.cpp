@@ -9,6 +9,12 @@
 
 class SandboxApp : public Application {
 private:
+    // Game constants
+    const float m_playfieldHalfWidth = 2.6f;
+    const float m_playfieldHalfHeight = 3.0f;
+    const float m_wallThickness = 0.12f;
+    const glm::vec3 m_paddleScale = glm::vec3(1.5f, 0.18f, 0.2f);
+
     double m_Accumulator = 0.0;
     std::mt19937 m_RandomEngine{ std::random_device{}() };
     std::shared_ptr<Shader> shader;
@@ -121,6 +127,25 @@ protected:
         PhysicsEngine::onBeforeDestroy = [this](PhysicsObject* obj){
             bricks.erase(std::remove(bricks.begin(), bricks.end(), obj), bricks.end());
         };
+    }
+
+    void OnInput() override {
+        const float paddleSpeed = 5.0f;
+        glm::vec3 currentPosition = paddle->getPosition(); //obtengo la posicion actual del paddle
+
+        if (m_Window->isKeyPressed(GLFW_KEY_A)) {
+            currentPosition.x -= paddleSpeed * timePerFrame;
+        }
+        if (m_Window->isKeyPressed(GLFW_KEY_D)) {
+            currentPosition.x += paddleSpeed * timePerFrame;
+        }
+
+        const float paddleHalfWidth = paddle->scale.x * 0.5f;
+        const float maxPaddleX = m_playfieldHalfWidth - m_wallThickness - paddleHalfWidth;
+        
+        currentPosition.x = std::max(-maxPaddleX, std::min(maxPaddleX, currentPosition.x));
+        
+        paddle->setPosition(currentPosition);
     }
 
     void OnUpdate(double deltaTime) override {

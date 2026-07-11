@@ -35,6 +35,7 @@ void PhysicsObject::setPosition(float x, float y, float z){
     rp3d::Transform currentTransform = m_RigidBody->getTransform();
     currentTransform.setPosition(rp3d::Vector3(x,y,z));
     m_RigidBody->setTransform(currentTransform);
+    update();
 }
 
 void PhysicsObject::update(){
