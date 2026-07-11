@@ -44,3 +44,7 @@ void Window::OnUpdate() {
 bool Window::ShouldClose() const {
     return glfwWindowShouldClose(m_Window);
 }
+
+bool Window::isKeyPressed(int key) const {
+    return glfwGetKey(m_Window, key) == GLFW_PRESS;
+}

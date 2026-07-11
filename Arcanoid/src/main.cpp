@@ -14,6 +14,11 @@
 
 class SandboxApp : public Application {
 private:
+    // Game constants
+    const float m_playfieldHalfWidth = 2.6f;
+    const float m_playfieldHalfHeight = 3.0f;
+    const float m_wallThickness = 0.12f;
+    const glm::vec3 m_paddleScale = glm::vec3(1.5f, 0.18f, 0.2f);
 
     double m_Accumulator = 0.0;
     std::mt19937 m_RandomEngine{ std::random_device{}() };
@@ -55,10 +60,6 @@ protected:
         Renderer::addPointLight(pointLight);
 
         constexpr float ballRadius = 0.1f;
-        constexpr glm::vec3 paddleScale(1.5f, 0.18f, 0.2f);
-        constexpr float playfieldHalfWidth = 2.6f;
-        constexpr float playfieldHalfHeight = 3.0f;
-        constexpr float wallThickness = 0.12f;
         constexpr float wallDepth = 0.35f;
         constexpr int brickColumns = 8;
         constexpr int brickRows = 5;
@@ -72,9 +73,9 @@ protected:
 
         ball = std::make_shared<PhysicsObject>(std::make_shared<Sphere>(), rp3d::BodyType::DYNAMIC);
         paddle = std::make_shared<PhysicsObject>(std::make_shared<Cube>(), rp3d::BodyType::STATIC);
-        paddle->scale = paddleScale;
+        paddle->scale = m_paddleScale;
         paddle->addCollider(PhysicsEngine::physicsCommon.createBoxShape(
-            rp3d::Vector3(paddleScale.x * 0.5f, paddleScale.y * 0.5f, paddleScale.z * 0.5f)));
+            rp3d::Vector3(m_paddleScale.x * 0.5f, m_paddleScale.y * 0.5f, m_paddleScale.z * 0.5f)));
 
         ball->scale = glm::vec3(ballRadius * 2.0f, ballRadius * 2.0f, ballRadius * 2.0f);
         ball->addCollider(PhysicsEngine::physicsCommon.createSphereShape(ballRadius));
@@ -106,19 +107,19 @@ protected:
             bricks.push_back(brick);
         };
 
-        createWall(glm::vec3(0.0f,  playfieldHalfHeight, 0.0f), glm::vec3(playfieldHalfWidth * 2.0f, wallThickness, wallDepth));
+        createWall(glm::vec3(0.0f,  m_playfieldHalfHeight, 0.0f), glm::vec3(m_playfieldHalfWidth * 2.0f, m_wallThickness, wallDepth));
         // Crear pared de abajo
-        createWall(glm::vec3(0.0f, -playfieldHalfHeight, 0.0f), glm::vec3(playfieldHalfWidth * 2.0f, wallThickness, wallDepth));
-        createWall(glm::vec3(-playfieldHalfWidth, 0.0f, 0.0f), glm::vec3(wallThickness, playfieldHalfHeight * 2.0f, wallDepth));
-        createWall(glm::vec3( playfieldHalfWidth, 0.0f, 0.0f), glm::vec3(wallThickness, playfieldHalfHeight * 2.0f, wallDepth));
+        createWall(glm::vec3(0.0f, -m_playfieldHalfHeight, 0.0f), glm::vec3(m_playfieldHalfWidth * 2.0f, m_wallThickness, wallDepth));
+        createWall(glm::vec3(-m_playfieldHalfWidth, 0.0f, 0.0f), glm::vec3(m_wallThickness, m_playfieldHalfHeight * 2.0f, wallDepth));
+        createWall(glm::vec3( m_playfieldHalfWidth, 0.0f, 0.0f), glm::vec3(m_wallThickness, m_playfieldHalfHeight * 2.0f, wallDepth));
 
-        const float usableWidth = (playfieldHalfWidth - wallThickness * 0.5f - brickSideMargin) * 2.0f;
-        const float usableHeight = (playfieldHalfHeight - wallThickness * 0.5f - brickTopMargin) - (-0.55f);
+        const float usableWidth = (m_playfieldHalfWidth - m_wallThickness * 0.5f - brickSideMargin) * 2.0f;
+        const float usableHeight = (m_playfieldHalfHeight - m_wallThickness * 0.5f - brickTopMargin) - (-0.55f);
         const float horizontalSpacing = std::max(brickGapX, (usableWidth - brickColumns * brickWidth) / std::max(1, brickColumns - 1));
         const float verticalSpacing = std::max(brickGapY, (usableHeight - brickRows * brickHeight) / std::max(1, brickRows - 1));
         const float totalBrickWidth = brickColumns * brickWidth + (brickColumns - 1) * horizontalSpacing;
         const float startX = -totalBrickWidth * 0.5f + brickWidth * 0.5f;
-        const float startY = playfieldHalfHeight - wallThickness - brickTopMargin - brickHeight * 0.5f;
+        const float startY = m_playfieldHalfHeight - m_wallThickness - brickTopMargin - brickHeight * 0.5f;
 
         for (int row = 0; row < brickRows; ++row) {
             for (int column = 0; column < brickColumns; ++column) {
@@ -158,6 +159,25 @@ protected:
         }
 
     
+    }
+
+    void OnInput() override {
+        const float paddleSpeed = 5.0f;
+        glm::vec3 currentPosition = paddle->getPosition(); //obtengo la posicion actual del paddle
+
+        if (m_Window->isKeyPressed(GLFW_KEY_A)) {
+            currentPosition.x -= paddleSpeed * timePerFrame;
+        }
+        if (m_Window->isKeyPressed(GLFW_KEY_D)) {
+            currentPosition.x += paddleSpeed * timePerFrame;
+        }
+
+        const float paddleHalfWidth = paddle->scale.x * 0.5f;
+        const float maxPaddleX = m_playfieldHalfWidth - m_wallThickness - paddleHalfWidth;
+        
+        currentPosition.x = std::max(-maxPaddleX, std::min(maxPaddleX, currentPosition.x));
+        
+        paddle->setPosition(currentPosition);
     }
 
     void OnUpdate(double deltaTime) override {

@@ -9,6 +9,7 @@ public:
 
     void OnUpdate();
     bool ShouldClose() const;
+    bool isKeyPressed(int key) const;
 
 private:
     GLFWwindow* m_Window;
