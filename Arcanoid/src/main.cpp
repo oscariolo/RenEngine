@@ -37,9 +37,11 @@ protected:
         timePerFrame = 1.0f / FPS;
         glEnable(GL_DEPTH_TEST);
 
-        camera = Camera(glm::vec3(1.0f, -3.0f, 2.5f),
-                        glm::vec3(0.0f, 0.0f, 0.0f),
+        camera = Camera(glm::vec3(0.0f, -5.0f, 4.0f),
+                        glm::vec3(0.0f, 1.0f, 1.0f),
                         glm::vec3(0.0f, 1.0f, 0.0f));
+        
+        //camera.rotate(20.0f, 20.0f, 50.0f); 
         
         
         
@@ -86,6 +88,26 @@ protected:
             rp3d::Vector3(paddleScale.x * 0.5f, paddleScale.y * 0.5f, paddleScale.z * 0.5f)));
         paddle->setMaterialProperties(0.0f, 0.0f, 1.0f);
         paddle->setPosition(0.0f, -2.0f, 0.0f);
+        paddle->onCollisionCallback([](PhysicsObject* self, PhysicsObject* other){
+            if(other == nullptr) return;
+            if(other->getRigidBody() == nullptr) return;
+            if(self == nullptr) return;
+
+            // Calculate the offset based on the collision point
+            rp3d::Vector3 collisionPoint = other->getRigidBody()->getTransform().getPosition();
+            rp3d::Vector3 paddlePosition = self->getRigidBody()->getTransform().getPosition();
+            float offset = collisionPoint.x - paddlePosition.x;
+
+            // Adjust the ball's velocity based on the offset
+            rp3d::Vector3 currentVelocity = other->getRigidBody()->getLinearVelocity();
+            float speed = currentVelocity.length();
+            float newDirectionX = offset * 2.0f; // Scale the offset for more pronounced effect
+            rp3d::Vector3 newVelocity(newDirectionX, currentVelocity.y, 0);
+            newVelocity.normalize();
+            newVelocity *= speed; // Maintain the original speed
+
+            other->getRigidBody()->setLinearVelocity(newVelocity);
+        });
 
         // --- Walls ---
         auto spawnWall = [&](glm::vec3 pos, glm::vec3 s) {
@@ -155,18 +177,6 @@ protected:
     }
 
     void OnUpdate(double deltaTime) override {
-        m_Accumulator += deltaTime;
-        // if(m_Accumulator >= 1.25){
-        //     m_Accumulator = 0.0;
-        //     const rp3d::Vector3 vel    = ball->getRigidBody()->getLinearVelocity();
-        //     const float         hSpeed = std::abs(static_cast<float>(vel.x));
-        //     const float         rnd    = std::uniform_real_distribution<float>(0,1)(m_RandomEngine);
-        //     if(hSpeed < 0.75f || rnd < 0.35f){
-        //         const float dir = (std::uniform_real_distribution<float>(0,1)(m_RandomEngine) < 0.5f) ? -1.0f : 1.0f;
-        //         ball->getRigidBody()->setLinearVelocity(rp3d::Vector3(vel.x + dir*1.75f, vel.y, 0));
-        //     }
-        // }
-
 
         pointLight->setPosition(ball->getPosition().x, ball->getPosition().y, ball->getPosition().z);
 

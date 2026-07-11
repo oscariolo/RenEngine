@@ -14,6 +14,7 @@ class Camera{
         void setPosition(const glm::vec3& position);
         void setTarget(const glm::vec3& target);
         glm::vec3 getPosition() const;
+        void rotate(float degX, float degY, float degZ);
     
     private:
         glm::vec3 position;
