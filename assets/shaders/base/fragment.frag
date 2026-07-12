@@ -24,6 +24,11 @@ vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir);
 vec3 CalcDirectionalLight(vec3 lightDir, vec3 normal, vec3 viewDir);
 float CalcAttenuation(PointLight light, vec3 fragPos);
 
+
+in vec2 TexCoord;
+uniform sampler2D ourTexture;
+uniform bool useTexture = false;
+
 void main()
 {
     vec3 FragOut = vec3(0.0, 0.0, 0.0);
@@ -36,14 +41,18 @@ void main()
         }
     }
 
-    //FragOut += CalcDirectionalLight(normalize(directionalLightDir), norm, viewDir);
     FragOut = FragOut * ourColor;
-    FragColor = vec4(FragOut, 1.0);
-
+    if(useTexture)
+    {
+        FragColor =  texture(ourTexture, TexCoord) * vec4(FragOut, 1.0);
+    }
+    else
+    {
+        FragColor = vec4(FragOut, 1.0);
+    }
 }
 
 vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
-
 {
         //ambient
     vec3 ambient = light.ambient;

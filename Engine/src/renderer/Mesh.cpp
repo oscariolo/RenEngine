@@ -37,6 +37,12 @@ void Mesh::setupBuffers() {
     glBindVertexArray(0);
 }
 
+void Mesh::setupTexture(){
+    glBindVertexArray(VAO_ID);
+    glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, texCoords));
+    glEnableVertexAttribArray(3);
+}
+
 std::vector<Vertex> Mesh::getVertices() const {
     return vertices;
 }

@@ -19,6 +19,7 @@ target_include_directories(Engine PUBLIC
     "${CMAKE_SOURCE_DIR}/vendor/glad/include"
     "${CMAKE_SOURCE_DIR}/vendor/glm"
     "${CMAKE_SOURCE_DIR}/vendor/reactphysics3d/include"
+    "${CMAKE_SOURCE_DIR}/vendor/other"
 )
 
 # Find system OpenGL

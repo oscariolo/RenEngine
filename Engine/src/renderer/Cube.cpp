@@ -3,6 +3,7 @@
 Cube::Cube() {
     generateVertices();
     setupBuffers();
+    setupTexture();
 }
 
 Cube::~Cube() {
@@ -67,4 +68,13 @@ void Cube::generateVertices() {
         // Bottom face
         20, 21, 22,     22, 23, 20
     };
+
+    // Texture coordinates for each vertex (same for all faces)
+    for (int i = 0; i < 6; ++i) {
+        vertices[i * 4 + 0].texCoords = glm::vec2(0.0f, 0.0f); // Bottom-left
+        vertices[i * 4 + 1].texCoords = glm::vec2(1.0f, 0.0f); // Bottom-right
+        vertices[i * 4 + 2].texCoords = glm::vec2(1.0f, 1.0f); // Top-right
+        vertices[i * 4 + 3].texCoords = glm::vec2(0.0f, 1.0f); // Top-left
+    }
+
 }
