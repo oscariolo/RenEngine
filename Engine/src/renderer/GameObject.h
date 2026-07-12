@@ -35,23 +35,15 @@ class GameObject {
         std::shared_ptr<Mesh> getMesh() const;
         void draw();
         virtual void update();
+        void setTexture(Texture* texture) {
+            this->texture = texture;
+        }
         
         glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f);
         glm::vec3 rotation = glm::vec3(0.0f, 0.0f, 0.0f);
-        
-    public:
         std::shared_ptr<Mesh> m_Mesh;
         glm::vec3 scale = glm::vec3(1.0f, 1.0f, 1.0f);
-    
-    private:
-        uint64_t generateUniqueID() {
-            static std::atomic<uint64_t> counter(0);
-            return ++counter;
-        }
-
-    protected:
-        uint64_t m_ID;
-    
+        Texture* texture = nullptr;
 
 
 

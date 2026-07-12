@@ -3,7 +3,6 @@
 Cube::Cube() {
     generateVertices();
     setupBuffers();
-    setupTexture();
 }
 
 Cube::~Cube() {

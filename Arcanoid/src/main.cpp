@@ -21,6 +21,7 @@ private:
     std::shared_ptr<Shader> shader;
     std::shared_ptr<PointLight> pointLight;
     Camera camera;
+    Texture brickTexture;
 
     // Raw observer pointers — PhysicsEngine owns the memory.
     PhysicsObject* ball   = nullptr;
@@ -43,6 +44,7 @@ protected:
         
         //camera.rotate(20.0f, 20.0f, 50.0f); 
         
+        brickTexture.loadTexture("assets/textures/rene.jpg");
         
         
 
@@ -136,6 +138,7 @@ protected:
         for(int row = 0; row < brickRows; ++row){
             for(int col = 0; col < brickColumns; ++col){
                 auto* brick = PhysicsEngine::spawn<Brick>(std::make_shared<Cube>(), rp3d::BodyType::STATIC);
+                brick->setTexture(&brickTexture);
                 brick->scale = glm::vec3(brickWidth, brickHeight, brickDepth);
                 brick->addCollider(PhysicsEngine::physicsCommon.createBoxShape(
                     rp3d::Vector3(brickWidth*0.5f, brickHeight*0.5f, brickDepth*0.5f)));

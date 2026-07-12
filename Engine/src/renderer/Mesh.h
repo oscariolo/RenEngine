@@ -12,13 +12,11 @@ class Mesh{
         std::vector<Vertex> getVertices() const;
         std::vector<unsigned int> getIndices() const;
         unsigned int VAO_ID, VBO_ID, EBO_ID;
-        Texture texture;
         std::vector<Vertex> vertices;
         std::vector<unsigned int> indices;
     
     protected:
 
         void setupBuffers();
-        void setupTexture();
-
+        
 };

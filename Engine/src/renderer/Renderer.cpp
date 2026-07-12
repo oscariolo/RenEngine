@@ -47,10 +47,10 @@ void Renderer::submit(Shader* shader, GameObject* gameObject) {
         shader->SetInt("numLights", static_cast<int>(m_PointLights.size()));
     }
     //Texturas 
-    if(gameObject->m_Mesh->texture.m_textureID != 0){
+    if(gameObject->texture && gameObject->texture->m_textureID != 0){
         shader->SetInt("useTexture", 1);
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, gameObject->m_Mesh->texture.m_textureID);
+        glBindTexture(GL_TEXTURE_2D, gameObject->texture->m_textureID);
     }else{
         shader->SetInt("useTexture", 0);
     }

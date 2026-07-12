@@ -4,15 +4,7 @@
 
 class Brick : public PhysicsObject {
     public:
-           Brick(const std::shared_ptr<Mesh>& mesh, rp3d::BodyType type = rp3d::BodyType::STATIC)
-        : PhysicsObject(mesh, type),
-          isBeingDestroyed(false),
-          destructionTimer(0.0f)
-    {
-        Texture texture;
-        texture.loadTexture("assets/textures/rene.jpg");
-        this->m_Mesh->texture = texture;
-    }
+        using PhysicsObject::PhysicsObject; // Inherit constructors from PhysicsObject
 
     public:
         bool isBeingDestroyed = false;

@@ -3,7 +3,7 @@
 
 
 GameObject::GameObject(){
-    m_ID = generateUniqueID();
+    
 }
 
 GameObject::~GameObject() {
@@ -11,7 +11,7 @@ GameObject::~GameObject() {
 }
 
 GameObject::GameObject(const std::shared_ptr<Mesh>& mesh) : m_Mesh(mesh) {
-    m_ID = generateUniqueID();
+    
 }
 
 void GameObject::setMesh(const std::shared_ptr<Mesh>& mesh) {   
