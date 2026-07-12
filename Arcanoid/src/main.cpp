@@ -42,8 +42,6 @@ protected:
                         glm::vec3(0.0f, 1.0f, 1.0f),
                         glm::vec3(0.0f, 1.0f, 0.0f));
         
-        //camera.rotate(20.0f, 20.0f, 50.0f); 
-        
         brickTexture.loadTexture("assets/textures/rene.jpg");
         
         
@@ -120,9 +118,15 @@ protected:
             w->setMaterialProperties(0.0f, 0.5f, 1.0f);
             w->setPosition(pos.x, pos.y, pos.z);
             walls.push_back(w);
+            return w;
         };
         spawnWall({0,  playfieldHalfHeight, 0}, {playfieldHalfWidth*2, wallThickness, wallDepth});
-        spawnWall({0, -playfieldHalfHeight, 0}, {playfieldHalfWidth*2, wallThickness, wallDepth});
+        auto bottomWall = spawnWall({0, -playfieldHalfHeight, 0}, {playfieldHalfWidth*2, wallThickness, wallDepth});
+        bottomWall->onCollisionCallback([this](PhysicsObject* self, PhysicsObject* other){
+            if(other == ball){
+                freezeUpdate = true;
+            };
+        });
         spawnWall({-playfieldHalfWidth, 0,  0}, {wallThickness, playfieldHalfHeight*2, wallDepth});
         spawnWall({ playfieldHalfWidth, 0,  0}, {wallThickness, playfieldHalfHeight*2, wallDepth});
 
@@ -139,7 +143,7 @@ protected:
             for(int col = 0; col < brickColumns; ++col){
                 auto* brick = PhysicsEngine::spawn<Brick>(std::make_shared<Cube>(), rp3d::BodyType::STATIC);
                 brick->setTexture(&brickTexture);
-                brick->scale = glm::vec3(brickWidth, brickHeight, brickDepth);
+                brick->setScale(glm::vec3(brickWidth, brickHeight, brickDepth));
                 brick->addCollider(PhysicsEngine::physicsCommon.createBoxShape(
                     rp3d::Vector3(brickWidth*0.5f, brickHeight*0.5f, brickDepth*0.5f)));
                 brick->setMaterialProperties(0.0f, 0.5f, 1.0f);
@@ -154,20 +158,26 @@ protected:
             }
         }
 
-        PhysicsEngine::onBeforeDestroy = [this](PhysicsObject* obj){
-            bricks.erase(std::remove(bricks.begin(), bricks.end(), obj), bricks.end());
-        };
     }
 
     void OnInput() override {
         const float paddleSpeed = 5.0f;
         glm::vec3 currentPosition = paddle->getPosition(); //obtengo la posicion actual del paddle
 
-        if (m_Window->isKeyPressed(GLFW_KEY_A)) {
+        if (m_Window->isKeyPressed(GLFW_KEY_A) && !freezeUpdate) {
             currentPosition.x -= paddleSpeed * timePerFrame;
         }
-        if (m_Window->isKeyPressed(GLFW_KEY_D)) {
+        if (m_Window->isKeyPressed(GLFW_KEY_D) && !freezeUpdate) {
             currentPosition.x += paddleSpeed * timePerFrame;
+        }
+
+        if(freezeUpdate && m_Window->isKeyPressed(GLFW_KEY_R)){
+            freezeUpdate = false;
+            ball->setPosition(0.0f, -1.0f, 0.0f);
+            ball->getRigidBody()->setLinearVelocity(rp3d::Vector3(0, 4.0f, 0));
+            for(auto* b : bricks){
+                b->reset();
+            }
         }
 
         const float paddleHalfWidth = paddle->scale.x * 0.5f;
@@ -189,7 +199,7 @@ protected:
     void OnRender() override {
         for(auto* w : walls)  Renderer::submit(shader.get(), w);
         for(auto* b : bricks){
-            if(!b->m_isQueuedForDeletion) Renderer::submit(shader.get(), b);
+            if(b->visible) Renderer::submit(shader.get(), b);
         }
         Renderer::submit(shader.get(), ball);
         Renderer::submit(shader.get(), paddle);

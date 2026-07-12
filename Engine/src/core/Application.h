@@ -18,6 +18,7 @@ protected:
 
     std::unique_ptr<Window> m_Window;
     bool m_Running = true;
+    bool freezeUpdate = false;
     int FPS = 60;
     float timePerFrame = 1.0f / FPS;
     double accumulator = 0.0f;

@@ -44,6 +44,7 @@ class GameObject {
         std::shared_ptr<Mesh> m_Mesh;
         glm::vec3 scale = glm::vec3(1.0f, 1.0f, 1.0f);
         Texture* texture = nullptr;
+        bool visible = true;
 
 
 
