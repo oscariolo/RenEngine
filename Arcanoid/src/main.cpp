@@ -17,6 +17,8 @@ private:
     const float m_wallThickness = 0.12f;
     const glm::vec3 m_paddleScale = glm::vec3(1.5f, 0.18f, 0.2f);
 
+    int m_Score = 0;
+
     double m_Accumulator = 0.0;
     std::mt19937 m_RandomEngine{ std::random_device{}() };
     std::shared_ptr<Shader> shader;
@@ -166,8 +168,13 @@ protected:
                     startX + col*(brickWidth + hSpacing),
                     startY - row*(brickHeight + vSpacing),
                     0.0f);
-                brick->onCollisionCallback([](PhysicsObject* self, PhysicsObject*){
-                    static_cast<Brick*>(self)->killBrick();
+                brick->onCollisionCallback([this](PhysicsObject* self, PhysicsObject*){
+                    Brick* brickPtr = static_cast<Brick*>(self);
+                    
+                    if (brickPtr->visible) {
+                        brickPtr->killBrick();
+                        this->m_Score++; // Acceder a m_Score a través de 'this'
+                    }
                 });
                 bricks.push_back(brick);
             }
@@ -188,6 +195,7 @@ protected:
 
         if(freezeUpdate && m_Window->isKeyPressed(GLFW_KEY_R)){
             freezeUpdate = false;
+            m_Score = 0;
             ball->setPosition(0.0f, -1.0f, 0.0f);
             ball->getRigidBody()->setLinearVelocity(rp3d::Vector3(0, 4.0f, 0));
             for(auto* b : bricks){
@@ -219,7 +227,9 @@ protected:
         Renderer::submit(shader.get(), ball);
         Renderer::submit(shader.get(), paddle);
 
-        textRenderer->RenderText("SCORE: 0  LIVES: 3", 5.0f, m_Window->getHeight() - 20.0f, 0.4f, glm::vec3(1.0, 1.0, 1.0f));
+        std::string hudText = "SCORE: " + std::to_string(m_Score) + "  LIVES: 3";
+
+        textRenderer->RenderText(hudText, 5.0f, m_Window->getHeight() - 20.0f, 0.4f, glm::vec3(1.0, 1.0, 1.0f));
 
         if (freezeUpdate) {
             const float windowWidth = static_cast<float>(m_Window->getWidth());
