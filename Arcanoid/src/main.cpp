@@ -79,12 +79,12 @@ protected:
         constexpr float     wallThickness       = 0.12f;
         constexpr float     wallDepth           = 0.35f;
         constexpr int       brickColumns        = 8;
-        constexpr int       brickRows           = 5;
-        constexpr float     brickWidth          = 0.3f;
-        constexpr float     brickHeight         = 0.2f;
+        constexpr int       brickRows           = 8;
+        // constexpr float     brickWidth          = 0.3f;
+        // constexpr float     brickHeight         = 0.2f;
         constexpr float     brickDepth          = 0.3f;
-        constexpr float     brickGapX           = 0.12f;
-        constexpr float     brickGapY           = 0.05f;
+        constexpr float     brickGapX           = 0.02f;
+        constexpr float     brickGapY           = 0.02f;
         constexpr float     brickTopMargin      = 0.1f;
         constexpr float     brickSideMargin     = 0.18f;
 
@@ -171,9 +171,14 @@ protected:
 
         // --- Bricks ---
         const float usableWidth  = (playfieldHalfWidth - wallThickness*0.5f - brickSideMargin) * 2.0f;
-        const float usableHeight = (playfieldHalfHeight - wallThickness*0.5f - brickTopMargin) - (-0.55f);
-        const float hSpacing     = std::max(brickGapX, (usableWidth  - brickColumns*brickWidth)  / std::max(1, brickColumns-1));
-        const float vSpacing     = std::max(brickGapY, (usableHeight - brickRows*brickHeight)    / std::max(1, brickRows-1));
+        // const float usableHeight = (playfieldHalfHeight - wallThickness*0.5f - brickTopMargin) - (-0.55f);
+        const float brickWidth = (usableWidth - (brickColumns - 1) * brickGapX) / brickColumns;
+        const float brickHeight = 0.2f; // Fixed height for bricks
+        
+        // const float hSpacing     = std::max(brickGapX, (usableWidth  - brickColumns*brickWidth)  / std::max(1, brickColumns-1));
+        // const float vSpacing     = std::max(brickGapY, (usableHeight - brickRows*brickHeight)    / std::max(1, brickRows-1));
+        const float hSpacing     = brickGapX;
+        const float vSpacing     = brickGapY;
         const float totalW       = brickColumns*brickWidth + (brickColumns-1)*hSpacing;
         const float startX       = -totalW*0.5f + brickWidth*0.5f;
         const float startY       = playfieldHalfHeight - wallThickness - brickTopMargin - brickHeight*0.5f;
