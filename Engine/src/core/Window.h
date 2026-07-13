@@ -15,6 +15,7 @@ public:
     int getHeight() const { return m_Height; }
 
 private:
+    static void framebufferResizeCallback(GLFWwindow* window, int width, int height);
     GLFWwindow* m_Window;
     int m_Width, m_Height;
 };

@@ -46,7 +46,7 @@ protected:
         timePerFrame = 1.0f / FPS;
         glEnable(GL_DEPTH_TEST);
 
-        camera = Camera(glm::vec3(0.0f, -5.0f, 4.0f),
+        camera = Camera(glm::vec3(0.0f, -7.0f, 6.0f),
                         glm::vec3(0.0f, 1.0f, 1.0f),
                         glm::vec3(0.0f, 1.0f, 0.0f));
         

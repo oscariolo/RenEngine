@@ -11,6 +11,7 @@ class Renderer {
 
     public:
         static void init();
+        static void updateProjection(int width, int height);
 
         static void setCamera(Camera& camera);
         static void addPointLight(const std::shared_ptr<PointLight>& pointLight);

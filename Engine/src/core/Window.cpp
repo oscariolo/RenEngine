@@ -1,4 +1,5 @@
 #include "Window.h"
+#include "renderer/Renderer.h"
 #include <iostream>
 
 Window::Window(int width, int height, const char* title) 
@@ -28,7 +29,23 @@ Window::Window(int width, int height, const char* title)
         return;
     }
 
+    // Store a pointer to this Window so the static callback can reach m_Width/m_Height.
+    glfwSetWindowUserPointer(m_Window, this);
+
+    // This fires whenever the framebuffer is resized — including fullscreen
+    // transitions — and updates both the stored dimensions and glViewport.
+    glfwSetFramebufferSizeCallback(m_Window, framebufferResizeCallback);
+
     glViewport(0, 0, m_Width, m_Height);
+}
+
+void Window::framebufferResizeCallback(GLFWwindow* window, int width, int height) {
+    auto* self = static_cast<Window*>(glfwGetWindowUserPointer(window));
+    self->m_Width  = width;
+    self->m_Height = height;
+
+    glViewport(0, 0, width, height);
+    Renderer::updateProjection(width, height);
 }
 
 Window::~Window() {

@@ -60,3 +60,9 @@ void Renderer::submit(Shader* shader, GameObject* gameObject) {
 
 }
 
+void Renderer::updateProjection(int width, int height) {
+    if(height == 0) return;
+    float aspect = static_cast<float>(width) / static_cast<float>(height);
+    m_ProjectionMatrix = Projections::perspective(aspect);
+}
+
