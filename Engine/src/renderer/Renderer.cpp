@@ -41,6 +41,7 @@ void Renderer::submit(Shader* shader, GameObject* gameObject) {
     shader->Bind();
 
     shader->SetMat4("model", gameObject->getTransform());
+    shader->SetVec3("uniformColor", gameObject->uniformColor);
     shader->SetMat4("view", m_Camera->getViewMatrix());
     shader->SetVec3("cameraPos", m_Camera->getPosition());
     shader->SetMat4("projection", m_ProjectionMatrix);

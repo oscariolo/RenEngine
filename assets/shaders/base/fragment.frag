@@ -28,6 +28,7 @@ float CalcAttenuation(PointLight light, vec3 fragPos);
 in vec2 TexCoord;
 uniform sampler2D ourTexture;
 uniform bool useTexture = false;
+uniform vec3 uniformColor = vec3(1.0, 1.0, 1.0);
 
 void main()
 {
@@ -41,7 +42,7 @@ void main()
         }
     }
 
-    FragOut = FragOut * ourColor;
+    FragOut = FragOut * ourColor * uniformColor;
     if(useTexture)
     {
         FragColor =  texture(ourTexture, TexCoord) * vec4(FragOut, 1.0);

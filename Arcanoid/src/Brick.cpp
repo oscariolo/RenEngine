@@ -7,6 +7,7 @@ Brick::Brick(float brickWidth, float brickHeight, float brickDepth) : PhysicsObj
         rp3d::Vector3(brickWidth * 0.5f, brickHeight * 0.5f, brickDepth * 0.5f)));
     setScale(glm::vec3(brickWidth, brickHeight, brickDepth));
     setMaterialProperties(0.0f, 0.5f, 1.0f);
+    uniformColor = glm::vec3(0.5f, 0.5f, 0.5f); // Red color for the brick
 }
 
 void Brick::killBrick() {
