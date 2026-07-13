@@ -15,9 +15,13 @@ private:
     const float m_playfieldHalfWidth = 2.6f;
     const float m_playfieldHalfHeight = 3.0f;
     const float m_wallThickness = 0.12f;
+    const float m_ballSpeed = 4.0f;
     const glm::vec3 m_paddleScale = glm::vec3(1.5f, 0.18f, 0.2f);
 
     int m_Score = 0;
+    int m_Lives = 3;
+    bool m_GameWon = false;
+    double m_InvulnerabilityTimer = 0.0;
 
     double m_Accumulator = 0.0;
     std::mt19937 m_RandomEngine{ std::random_device{}() };
@@ -85,7 +89,6 @@ protected:
         constexpr float     brickGapY           = 0.05f;
         constexpr float     brickTopMargin      = 0.1f;
         constexpr float     brickSideMargin     = 0.18f;
-        constexpr float     ballSpeed           = 4.0f;
 
         // --- Ball ---
         ball = PhysicsEngine::spawn<PhysicsObject>(std::make_shared<Sphere>(), rp3d::BodyType::DYNAMIC);
@@ -96,7 +99,7 @@ protected:
         ball->getRigidBody()->setLinearLockAxisFactor(rp3d::Vector3(1, 1, 0));
         ball->getRigidBody()->setAngularLockAxisFactor(rp3d::Vector3(0, 0, 1));
         ball->setPosition(0.0f, -1.0f, 0.0f);
-        ball->getRigidBody()->setLinearVelocity(rp3d::Vector3(0, ballSpeed, 0));
+        ball->getRigidBody()->setLinearVelocity(rp3d::Vector3(0, m_ballSpeed, 0));
 
         // --- Paddle ---
         paddle = PhysicsEngine::spawn<PhysicsObject>(std::make_shared<Cube>(), rp3d::BodyType::STATIC);
@@ -138,10 +141,25 @@ protected:
             return w;
         };
         spawnWall({0,  playfieldHalfHeight, 0}, {playfieldHalfWidth*2, wallThickness, wallDepth});
+        
         auto bottomWall = spawnWall({0, -playfieldHalfHeight, 0}, {playfieldHalfWidth*2, wallThickness, wallDepth});
         bottomWall->onCollisionCallback([this](PhysicsObject* self, PhysicsObject* other){
-            if(other == ball){
-                freezeUpdate = true;
+            if(other == ball && !freezeUpdate && m_InvulnerabilityTimer <= 0.0) {
+                m_InvulnerabilityTimer = 0.5; // Activate invulnerability for 1 second
+                m_Lives--;
+
+                if(m_Lives <= 0){
+                    freezeUpdate = true; // Game over, freeze the game
+                    m_GameWon = false; // Set game won to false
+                    ball->getRigidBody()->setLinearVelocity(rp3d::Vector3(0, 0, 0));
+                    ball->getRigidBody()->setAngularVelocity(rp3d::Vector3(0, 0, 0));
+                    ball->setPosition(0.0f, -1.0f, 0.0f);
+                } else {
+                    ball->setPosition(0.0f, -1.0f, 0.0f);
+                    ball->getRigidBody()->setLinearVelocity(rp3d::Vector3(0, m_ballSpeed, 0));
+                    ball->getRigidBody()->setAngularVelocity(rp3d::Vector3(0, 0, 0));
+                    paddle->setPosition(0.0f, -2.0f, 0.0f);
+                }
             };
         });
         spawnWall({-playfieldHalfWidth, 0,  0}, {wallThickness, playfieldHalfHeight*2, wallDepth});
@@ -170,16 +188,47 @@ protected:
                     0.0f);
                 brick->onCollisionCallback([this](PhysicsObject* self, PhysicsObject*){
                     Brick* brickPtr = static_cast<Brick*>(self);
-                    
                     if (brickPtr->visible) {
                         brickPtr->killBrick();
-                        this->m_Score++; // Acceder a m_Score a través de 'this'
+                        this->m_Score++; 
+
+                        bool allBricksDestroyed = std::all_of(bricks.begin(), bricks.end(), [](Brick* b) {
+                            return !b->visible;
+                        });
+                        if (allBricksDestroyed) {
+                            this->freezeUpdate = true; // Freeze the game
+                            this->m_GameWon = true; // Set game won to true
+                            ball->getRigidBody()->setLinearVelocity(rp3d::Vector3(0, 0, 0));
+                            ball->getRigidBody()->setAngularVelocity(rp3d::Vector3(0, 0, 0));
+                        }
                     }
                 });
                 bricks.push_back(brick);
             }
         }
 
+        // // --- Single Brick for testing Win Screen ---
+        // auto* brick = PhysicsEngine::spawn<Brick>(std::make_shared<Cube>(), rp3d::BodyType::STATIC);
+        // brick->setTexture(&brickTexture);
+        // brick->setScale(glm::vec3(brickWidth, brickHeight, brickDepth));
+        // brick->addCollider(PhysicsEngine::physicsCommon.createBoxShape(
+        //     rp3d::Vector3(brickWidth*0.5f, brickHeight*0.5f, brickDepth*0.5f)));
+        // brick->setMaterialProperties(0.0f, 0.5f, 1.0f);
+        // brick->setPosition(0.0f, 1.0f, 0.0f); // Posiciona el ladrillo en el centro superior
+        // brick->onCollisionCallback([this](PhysicsObject* self, PhysicsObject*){
+        //     Brick* brickPtr = static_cast<Brick*>(self);
+        //     if (brickPtr->visible) {
+        //         brickPtr->killBrick();
+        //         this->m_Score++; 
+                
+        //         // Con un solo ladrillo, si este se destruye, el juego se gana.
+        //         this->freezeUpdate = true; // Freeze the game
+        //         this->m_GameWon = true; // Set game won to true
+        //         ball->getRigidBody()->setLinearVelocity(rp3d::Vector3(0, 0, 0));
+        //         ball->getRigidBody()->setAngularVelocity(rp3d::Vector3(0, 0, 0));
+        //     }
+        // });
+        // bricks.push_back(brick);
     }
 
     void OnInput() override {
@@ -195,9 +244,13 @@ protected:
 
         if(freezeUpdate && m_Window->isKeyPressed(GLFW_KEY_R)){
             freezeUpdate = false;
+            m_GameWon = false;
             m_Score = 0;
+            m_Lives = 3;
+            m_InvulnerabilityTimer = 0.3;
             ball->setPosition(0.0f, -1.0f, 0.0f);
-            ball->getRigidBody()->setLinearVelocity(rp3d::Vector3(0, -4.0f, 0));
+            ball->getRigidBody()->setLinearVelocity(rp3d::Vector3(0, m_ballSpeed, 0));
+            ball->getRigidBody()->setAngularVelocity(rp3d::Vector3(0, 0, 0));
             paddle->setPosition(0.0f, -2.0f, 0.0f);
             for(auto* b : bricks){
                 b->reset();
@@ -214,6 +267,13 @@ protected:
     }
 
     void OnUpdate(double deltaTime) override {
+        if (m_InvulnerabilityTimer > 0.0) {
+            m_InvulnerabilityTimer -= deltaTime;
+        }
+
+        if (freezeUpdate) {
+            return; // Skip the update if the game is frozen
+        }
 
         pointLight->setPosition(ball->getPosition().x, ball->getPosition().y, ball->getPosition().z);
 
@@ -228,29 +288,38 @@ protected:
         Renderer::submit(shader.get(), ball);
         Renderer::submit(shader.get(), paddle);
 
-        std::string hudText = "SCORE: " + std::to_string(m_Score) + "  LIVES: 3";
-
+        std::string hudText = "SCORE: " + std::to_string(m_Score) + "  LIVES: " + std::to_string(m_Lives);
         textRenderer->RenderText(hudText, 5.0f, m_Window->getHeight() - 20.0f, 0.4f, glm::vec3(1.0, 1.0, 1.0f));
 
         if (freezeUpdate) {
             const float windowWidth = static_cast<float>(m_Window->getWidth());
             const float windowHeight = static_cast<float>(m_Window->getHeight());
 
-            const std::string gameOverText = "GAME OVER!";
-            const float gameOverScale = 1.2f;
-            const float gameOverWidth = textRenderer->GetTextWidth(gameOverText, gameOverScale);
-            const float gameOverX = (windowWidth - gameOverWidth) * 0.5f;
-            const float gameOverY = windowHeight * 0.5f + 20.0f; // Slightly above center
+            const std::string titleText = m_GameWon ? "YOU WIN!" : "GAME OVER!";
+            const glm::vec3 titleColor = m_GameWon ? glm::vec3(0.3f, 1.0f, 0.4f) : glm::vec3(1.0f, 0.2f, 0.2f);
+            const float titleScale = 1.2f;
+            const float titleWidth = textRenderer->GetTextWidth(titleText, titleScale);
+            const float titleX = (windowWidth - titleWidth) * 0.5f;
+            const float titleY = windowHeight * 0.5f + 20.0f; // Slightly above center
 
-            textRenderer->RenderText(gameOverText, gameOverX, gameOverY, gameOverScale, glm::vec3(1.0f, 0.2f, 0.2f));
+            textRenderer->RenderText(titleText, titleX, titleY, titleScale, titleColor);
 
             const std::string restartText = "Press 'R' to Restart";
             const float restartScale = 0.5f;
             const float restartWidth = textRenderer->GetTextWidth(restartText, restartScale);
             const float restartX = (windowWidth - restartWidth) * 0.5f;
-            const float restartY = gameOverY - 60.0f;
+            const float restartY = titleY - 60.0f;
 
             textRenderer->RenderText(restartText, restartX, restartY, restartScale, glm::vec3(1.0f, 1.0f, 1.0f));
+
+            const std::string scoreText  = "Final Score: " + std::to_string(m_Score);
+            const float        scoreScale = 0.45f;
+            const float        scoreWidth = textRenderer->GetTextWidth(scoreText, scoreScale);
+            const float        scoreX     = (windowWidth - scoreWidth) * 0.5f;
+            const float        scoreY     = restartY - 40.0f;
+
+            textRenderer->RenderText(scoreText, scoreX, scoreY, scoreScale, glm::vec3(0.8f, 0.8f, 0.8f));
+        
         }
     }
 };
