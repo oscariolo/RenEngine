@@ -55,4 +55,14 @@ void Sphere::generateVertices(unsigned int stacks, unsigned int sectors, float r
             }
         }
     }
+
+    //agregar text coord
+    for(unsigned int i = 0; i <= stacks; ++i) {
+        for(unsigned int j = 0; j <= sectors; ++j) {
+            float s = static_cast<float>(j) / static_cast<float>(sectors);
+            float t = static_cast<float>(i) / static_cast<float>(stacks);
+            vertices[i * (sectors + 1) + j].texCoords = glm::vec2(s, t);
+        }
+    }
+
 }

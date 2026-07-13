@@ -100,6 +100,7 @@ protected:
         ball->getRigidBody()->setAngularLockAxisFactor(rp3d::Vector3(0, 0, 1));
         ball->setPosition(0.0f, -1.0f, 0.0f);
         ball->getRigidBody()->setLinearVelocity(rp3d::Vector3(0, m_ballSpeed, 0));
+        ball->setTexture(&brickTexture);
 
         // --- Paddle ---
         paddle = PhysicsEngine::spawn<PhysicsObject>(std::make_shared<Cube>(), rp3d::BodyType::STATIC);
@@ -261,9 +262,7 @@ protected:
         const float maxPaddleX = m_playfieldHalfWidth - m_wallThickness - paddleHalfWidth;
         
         currentPosition.x = std::max(-maxPaddleX, std::min(maxPaddleX, currentPosition.x));
-        
         paddle->setPosition(currentPosition);
-        ball->getRigidBody()->setAngularVelocity(rp3d::Vector3(0, 0, 3.0f * currentPosition.x));
     }
 
     void OnUpdate(double deltaTime) override {
@@ -276,6 +275,10 @@ protected:
         }
 
         pointLight->setPosition(ball->getPosition().x, ball->getPosition().y, ball->getPosition().z);
+        const float rotationSpeed = 2.0f; // Adjust this value to control the rotation speed
+        //when ball rotates continuosly the rotation axis is the direction of the velocity
+        ball->setRotation(ball->getRigidBody()->getLinearVelocity().x * rotationSpeed * glfwGetTime(), ball->getRigidBody()->getLinearVelocity().y * rotationSpeed * glfwGetTime(), ball->getRigidBody()->getLinearVelocity().z * rotationSpeed * glfwGetTime());
+
 
         PhysicsEngine::update(static_cast<float>(timePerFrame));
     }
