@@ -7,6 +7,7 @@
 #include <random>
 #include <vector>
 #include "Brick.h"
+#include "renderer/TextRenderer.h"
 
 class SandboxApp : public Application {
 private:
@@ -22,12 +23,19 @@ private:
     std::shared_ptr<PointLight> pointLight;
     Camera camera;
     Texture brickTexture;
+    TextRenderer* textRenderer;
 
     // Raw observer pointers — PhysicsEngine owns the memory.
     PhysicsObject* ball   = nullptr;
     PhysicsObject* paddle = nullptr;
     std::vector<Brick*> bricks;
     std::vector<PhysicsObject*> walls;
+
+public:
+    ~SandboxApp()
+    {
+        delete textRenderer;
+    }
 
 protected:
     void OnInit() override {
@@ -45,6 +53,9 @@ protected:
         //camera.rotate(20.0f, 20.0f, 50.0f); 
         
         brickTexture.loadTexture("assets/textures/rene.jpg");
+
+        textRenderer = new TextRenderer(m_Window->getWidth(), m_Window->getHeight());
+        textRenderer->Init("assets/fonts/VCR_OSD_MONO_1.001.ttf", 48);
         
         
 
@@ -193,6 +204,8 @@ protected:
         }
         Renderer::submit(shader.get(), ball);
         Renderer::submit(shader.get(), paddle);
+
+        textRenderer->RenderText("SCORE: 0  LIVES: 3", 5.0f, m_Window->getHeight() - 20.0f, 0.4f, glm::vec3(1.0, 1.0, 1.0f));
     }
 };
 
