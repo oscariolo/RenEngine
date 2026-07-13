@@ -1,6 +1,7 @@
 #include "Renderer.h"
 #include "GameObject.h"
 #include <glad/glad.h>
+#include <algorithm>
 #include "utils/Projections.h"
 #include <iostream>
 
@@ -23,6 +24,13 @@ void Renderer::setCamera(Camera& camera) {
 
 void Renderer::addPointLight(const std::shared_ptr<PointLight>& pointLight) {
     m_PointLights.push_back(pointLight);
+}
+
+void Renderer::removePointLight(const std::shared_ptr<PointLight>& pointLight) {
+    auto it = std::find(m_PointLights.begin(), m_PointLights.end(), pointLight);
+    if (it != m_PointLights.end()) {
+        m_PointLights.erase(it);
+    }
 }
 
 void Renderer::submit(Shader* shader, GameObject* gameObject) {

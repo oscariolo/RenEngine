@@ -20,7 +20,7 @@ class PhysicsObject : public GameObject{
 
         PhysicsObject(const std::shared_ptr<Mesh>& mesh, rp3d::BodyType type = rp3d::BodyType::STATIC);
         PhysicsObject(rp3d::BodyType type = rp3d::BodyType::DYNAMIC);
-        ~PhysicsObject();
+        virtual ~PhysicsObject(); //para destructores en objetos que heredan ej. luces
 
         void setRigidBody(rp3d::RigidBody* rigidBody);
         void update()override;

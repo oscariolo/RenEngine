@@ -34,10 +34,10 @@ private:
     AudioPlayer audioPlayer;
 
     // Raw observer pointers — PhysicsEngine owns the memory.
-    PhysicsObject* ball   = nullptr;
     PhysicsObject* paddle = nullptr;
     std::vector<Brick*> bricks;
     std::vector<PhysicsObject*> walls;
+    const float  ballRadius          = 0.25f;
 
 public:
     ~SandboxApp()
@@ -73,7 +73,6 @@ protected:
         Renderer::setCamera(camera);
         shader = std::make_shared<Shader>();
 
-        constexpr float     ballRadius          = 0.25f;
         constexpr glm::vec3 paddleScale         = glm::vec3(1.5f, 0.18f, 0.2f);
         constexpr float     playfieldHalfWidth  = 2.6f;
         constexpr float     playfieldHalfHeight = 3.0f;
@@ -90,7 +89,7 @@ protected:
         constexpr float     brickSideMargin     = 0.18f;
 
         // --- Ball ---
-        ball = PhysicsEngine::spawn<Ball>(ballRadius);
+        PhysicsEngine::spawn<Ball>(ballRadius);
 
         // --- Paddle ---
         paddle = PhysicsEngine::spawn<PhysicsObject>(std::make_shared<Cube>(), rp3d::BodyType::STATIC);
@@ -151,6 +150,7 @@ protected:
                     other->queue_free();
                     return;
                 }
+                other->queue_free();
 
                 m_InvulnerabilityTimer = 0.5; // Activate invulnerability for 1 second
                 m_Lives--;
@@ -160,9 +160,8 @@ protected:
                     m_GameWon = false; // Set game won to false
                     m_GameLost = true; // Set game lost to true
                 } else {
-                    other->setPosition(0.0f, -1.0f, 0.0f);
-                    other->getRigidBody()->setLinearVelocity(rp3d::Vector3(0, m_ballSpeed, 0));
-                    other->getRigidBody()->setAngularVelocity(rp3d::Vector3(0, 0, 0));
+                    //Reset ball and paddle position
+                    PhysicsEngine::spawn<Ball>(ballRadius);
                     paddle->setPosition(0.0f, -2.0f, 0.0f);
                 }
             };
@@ -191,6 +190,12 @@ protected:
                     if (brickPtr->visible) {
                         brickPtr->killBrick();
                         this->m_Score++; 
+                    }
+                    //random spawn
+                    if(rand() % 100 < 5) // 5% chance to spawn a DoubleBall power-up
+                    {
+                        auto* doubleBall = PhysicsEngine::spawn<DoubleBall>();
+                        doubleBall->setPosition(brickPtr->getPosition());
                     }
                     audioPlayer.playSound("assets/sounds/pong.mpeg");
                 });
@@ -240,10 +245,7 @@ protected:
             m_Score = 0;
             m_Lives = 3;
             m_InvulnerabilityTimer = 0.3;
-            ball->setPosition(0.0f, -1.0f, 0.0f);
-            ball->getRigidBody()->setLinearVelocity(rp3d::Vector3(0, m_ballSpeed, 0));
-            ball->getRigidBody()->setAngularVelocity(rp3d::Vector3(0, 0, 0));
-            paddle->setPosition(0.0f, -2.0f, 0.0f);
+            PhysicsEngine::spawn<Ball>(ballRadius);
             for(auto* b : bricks){
                 b->reset();
             }

@@ -16,3 +16,7 @@ Ball::Ball(float radius) : PhysicsObject(std::make_shared<Sphere>(), rp3d::BodyT
     Renderer::addPointLight(pointLight); // Add the point light to the renderer
 
 }
+
+Ball::~Ball() {
+    Renderer::removePointLight(pointLight); // Remove the point light from the renderer when the ball is destroyed
+}

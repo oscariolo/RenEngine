@@ -4,6 +4,7 @@
 
 class Ball : public PhysicsObject {
     public:
+        ~Ball() override;
         Ball(float radius = 0.5f);
         void update() override {
             if (pointLight) {
