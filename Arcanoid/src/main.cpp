@@ -83,8 +83,8 @@ protected:
         constexpr float     playfieldHalfHeight = 3.0f;
         constexpr float     wallThickness       = 0.12f;
         constexpr float     wallDepth           = 0.35f;
-        constexpr int       brickColumns        = 8;
-        constexpr int       brickRows           = 5;
+        constexpr int       brickColumns        = 1;
+        constexpr int       brickRows           = 1;
         constexpr float     brickWidth          = 0.3f;
         constexpr float     brickHeight         = 0.2f;
         constexpr float     brickDepth          = 0.3f;
@@ -195,16 +195,6 @@ protected:
                     if (brickPtr->visible) {
                         brickPtr->killBrick();
                         this->m_Score++; 
-
-                        bool allBricksDestroyed = std::all_of(bricks.begin(), bricks.end(), [](Brick* b) {
-                            return !b->visible;
-                        });
-                        if (allBricksDestroyed) {
-                            this->freezeUpdate = true; // Freeze the game
-                            this->m_GameWon = true; // Set game won to true
-                            ball->getRigidBody()->setLinearVelocity(rp3d::Vector3(0, 0, 0));
-                            ball->getRigidBody()->setAngularVelocity(rp3d::Vector3(0, 0, 0));
-                        }
                     }
                     audioPlayer.playSound("assets/sounds/pong.mpeg");
                 });
@@ -282,7 +272,15 @@ protected:
         const float rotationSpeed = 2.0f; // Adjust this value to control the rotation speed
         //when ball rotates continuosly the rotation axis is the direction of the velocity
         ball->setRotation(ball->getRigidBody()->getLinearVelocity().x * rotationSpeed * glfwGetTime(), ball->getRigidBody()->getLinearVelocity().y * rotationSpeed * glfwGetTime(), ball->getRigidBody()->getLinearVelocity().z * rotationSpeed * glfwGetTime());
-
+        bool allBricksDestroyed = std::all_of(bricks.begin(), bricks.end(), [](Brick* b) {
+            return !b->visible;
+        });
+        if (allBricksDestroyed) {
+            this->freezeUpdate = true; // Freeze the game
+            this->m_GameWon = true; // Set game won to true
+            ball->getRigidBody()->setLinearVelocity(rp3d::Vector3(0, 0, 0));
+            ball->getRigidBody()->setAngularVelocity(rp3d::Vector3(0, 0, 0));
+        }
 
         PhysicsEngine::update(static_cast<float>(timePerFrame));
     }
@@ -298,7 +296,7 @@ protected:
         std::string hudText = "SCORE: " + std::to_string(m_Score) + "  LIVES: " + std::to_string(m_Lives);
         textRenderer->RenderText(hudText, 5.0f, m_Window->getHeight() - 20.0f, 0.4f, glm::vec3(1.0, 1.0, 1.0f));
 
-        if (freezeUpdate) {
+        if (this->m_GameWon) {
             const float windowWidth = static_cast<float>(m_Window->getWidth());
             const float windowHeight = static_cast<float>(m_Window->getHeight());
 
