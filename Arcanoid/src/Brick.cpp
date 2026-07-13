@@ -23,7 +23,7 @@ void Brick::update(){
         getRigidBody()->setIsActive(false);
         destructionTimer += 1.0f/60.0f; // Assuming update is called at 60 FPS
         glm::vec3 currentScale = scale;
-        scale = glm::vec3(currentScale.x, currentScale.y * (1.0f - destructionTimer * 2.0f), currentScale.z); // Shrink vertically
+        scale = glm::vec3(currentScale.x * (1.0f - destructionTimer * 2.0f), currentScale.y * (1.0f - destructionTimer * 2.0f), currentScale.z * (1.0f - destructionTimer * 2.0f)); // Shrink vertically
         if(destructionTimer >= 0.5f){ // Destroy after 0.5 seconds
             visible = false;
             //queue_free();
