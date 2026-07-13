@@ -26,6 +26,7 @@ private:
     Camera camera;
     Texture brickTexture;
     TextRenderer* textRenderer;
+    AudioPlayer audioPlayer;
 
     // Raw observer pointers — PhysicsEngine owns the memory.
     PhysicsObject* ball   = nullptr;
@@ -43,6 +44,8 @@ protected:
     void OnInit() override {
         Renderer::init();
         PhysicsEngine::init();
+        audioPlayer.playMusic("assets/sounds/arcanoid.mp3", true);
+        audioPlayer.setMusicVolume(0.1f);
 
         FPS = 60;
         timePerFrame = 1.0f / FPS;
@@ -176,6 +179,7 @@ protected:
                         brickPtr->killBrick();
                         this->m_Score++; // Acceder a m_Score a través de 'this'
                     }
+                    audioPlayer.playSound("assets/sounds/pong.mpeg");
                 });
                 bricks.push_back(brick);
             }
