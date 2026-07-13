@@ -1,6 +1,7 @@
 #pragma once
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <functional>
 
 class Window {
 public:
@@ -11,8 +12,10 @@ public:
     bool ShouldClose() const;
     bool isKeyPressed(int key) const;
 
-    int getWidth() const { return m_Width; }
+    int getWidth()  const { return m_Width; }
     int getHeight() const { return m_Height; }
+
+    std::function<void(int, int)> onResize;
 
 private:
     static void framebufferResizeCallback(GLFWwindow* window, int width, int height);

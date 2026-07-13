@@ -38,6 +38,14 @@ TextRenderer::~TextRenderer()
     glDeleteTextures(1, &this->fontTexture);
 }
 
+void TextRenderer::updateProjection(unsigned int width, unsigned int height)
+{
+    glm::mat4 projection = glm::ortho(0.0f, static_cast<float>(width), 0.0f, static_cast<float>(height));
+    this->TextShader.Bind();
+    this->TextShader.SetMat4("projection", projection);
+    this->TextShader.Unbind();
+}
+
 void TextRenderer::Init(const char* fontPath, unsigned int fontSize)
 {
     // Read font file

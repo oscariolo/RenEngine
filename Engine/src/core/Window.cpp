@@ -46,6 +46,8 @@ void Window::framebufferResizeCallback(GLFWwindow* window, int width, int height
 
     glViewport(0, 0, width, height);
     Renderer::updateProjection(width, height);
+
+    if(self->onResize) self->onResize(width, height);
 }
 
 Window::~Window() {

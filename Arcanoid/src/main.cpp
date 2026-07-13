@@ -55,7 +55,11 @@ protected:
         textRenderer = new TextRenderer(m_Window->getWidth(), m_Window->getHeight());
         textRenderer->Init("assets/fonts/VCR_OSD_MONO_1.001.ttf", 48);
         
-        
+        // In OnInit, after constructing textRenderer:
+        m_Window->onResize = [this](int w, int h) {
+            textRenderer->updateProjection(w, h);
+        };
+                
 
         Renderer::setCamera(camera);
         shader = std::make_shared<Shader>();

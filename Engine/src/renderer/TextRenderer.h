@@ -19,6 +19,8 @@ public:
     // Renders a string of text using the pre-compiled list of characters
     void RenderText(std::string text, float x, float y, float scale, glm::vec3 color = glm::vec3(1.0f));
 
+    void updateProjection(unsigned int width, unsigned int height);
+    
 private:
     // Render state
     unsigned int VAO, VBO;
