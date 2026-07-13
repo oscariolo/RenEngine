@@ -10,11 +10,15 @@ class Ball : public PhysicsObject {
             if (pointLight) {
                 pointLight->setPosition(getPosition().x, getPosition().y, getPosition().z); // Update the point light's position to match the ball's position
             }
+            //la pelota siempre debe mantener la misma velocidad
+            rp3d::Vector3 currentDirection = getRigidBody()->getLinearVelocity().getUnit();
+            getRigidBody()->setLinearVelocity(currentDirection * ballSpeed);
             setRotation(getRigidBody()->getLinearVelocity().x * rotationSpeed * glfwGetTime(), getRigidBody()->getLinearVelocity().y * rotationSpeed * glfwGetTime(), getRigidBody()->getLinearVelocity().z * rotationSpeed * glfwGetTime());
             PhysicsObject::update(); // Call the base class update to sync position with physics
         }
     private:
         const float rotationSpeed = 2.0f; // Adjust this value to control the rotation speed
+        const float ballSpeed = 4.0f; // Adjust this value to control the ball speed
         static Texture& getSharedTexture() {
             static Texture texture = [](){
                 Texture t;

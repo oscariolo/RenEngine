@@ -250,6 +250,10 @@ protected:
             m_Score = 0;
             m_Lives = 3;
             m_InvulnerabilityTimer = 0.3;
+            //remover todas las bolas y crear una nueva
+            for(auto* ball : PhysicsEngine::getAllBodiesOfType<Ball>()){
+                ball->queue_free();
+            }
             PhysicsEngine::spawn<Ball>(ballRadius);
             for(auto* b : bricks){
                 b->reset();
