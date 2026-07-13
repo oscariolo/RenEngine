@@ -150,3 +150,17 @@ void TextRenderer::RenderText(std::string text, float x, float y, float scale, g
     // glEnable(GL_DEPTH_TEST); // Re-enable depth testing after text rendering
     glDisable(GL_BLEND);
 }
+
+float TextRenderer::GetTextWidth(const std::string& text, float scale) const
+{
+    float width = 0.0f;
+    for (char c : text)
+    {
+        if (c >= 32 && c < 128)
+        {
+            const stbtt_bakedchar* b = &cdata[c - 32];
+            width += b->xadvance * scale;
+        }
+    }
+    return width;
+}

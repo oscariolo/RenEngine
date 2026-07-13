@@ -220,6 +220,27 @@ protected:
         Renderer::submit(shader.get(), paddle);
 
         textRenderer->RenderText("SCORE: 0  LIVES: 3", 5.0f, m_Window->getHeight() - 20.0f, 0.4f, glm::vec3(1.0, 1.0, 1.0f));
+
+        if (freezeUpdate) {
+            const float windowWidth = static_cast<float>(m_Window->getWidth());
+            const float windowHeight = static_cast<float>(m_Window->getHeight());
+
+            const std::string gameOverText = "GAME OVER!";
+            const float gameOverScale = 1.2f;
+            const float gameOverWidth = textRenderer->GetTextWidth(gameOverText, gameOverScale);
+            const float gameOverX = (windowWidth - gameOverWidth) * 0.5f;
+            const float gameOverY = windowHeight * 0.5f + 20.0f; // Slightly above center
+
+            textRenderer->RenderText(gameOverText, gameOverX, gameOverY, gameOverScale, glm::vec3(1.0f, 0.2f, 0.2f));
+
+            const std::string restartText = "Press 'R' to Restart";
+            const float restartScale = 0.5f;
+            const float restartWidth = textRenderer->GetTextWidth(restartText, restartScale);
+            const float restartX = (windowWidth - restartWidth) * 0.5f;
+            const float restartY = gameOverY - 60.0f;
+
+            textRenderer->RenderText(restartText, restartX, restartY, restartScale, glm::vec3(1.0f, 1.0f, 1.0f));
+        }
     }
 };
 
