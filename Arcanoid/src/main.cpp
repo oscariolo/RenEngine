@@ -8,6 +8,8 @@
 #include <vector>
 #include "Brick.h"
 #include "renderer/TextRenderer.h"
+#include "DoubleBall.h"
+#include "Ball.h"
 
 class SandboxApp : public Application {
 private:
@@ -27,9 +29,7 @@ private:
     double m_Accumulator = 0.0;
     std::mt19937 m_RandomEngine{ std::random_device{}() };
     std::shared_ptr<Shader> shader;
-    std::shared_ptr<PointLight> pointLight;
     Camera camera;
-    Texture brickTexture;
     TextRenderer* textRenderer;
     AudioPlayer audioPlayer;
 
@@ -60,7 +60,6 @@ protected:
                         glm::vec3(0.0f, 1.0f, 1.0f),
                         glm::vec3(0.0f, 1.0f, 0.0f));
         
-        brickTexture.loadTexture("assets/textures/rene.jpg");
 
         textRenderer = new TextRenderer(m_Window->getWidth(), m_Window->getHeight());
         textRenderer->Init("assets/fonts/VCR_OSD_MONO_1.001.ttf", 48);
@@ -74,11 +73,7 @@ protected:
         Renderer::setCamera(camera);
         shader = std::make_shared<Shader>();
 
-        pointLight = std::make_shared<PointLight>();
-        pointLight->setPosition(-1.0f, 3.0f, 0.0f);
-        Renderer::addPointLight(pointLight);
-
-        constexpr float     ballRadius          = 0.1f;
+        constexpr float     ballRadius          = 0.25f;
         constexpr glm::vec3 paddleScale         = glm::vec3(1.5f, 0.18f, 0.2f);
         constexpr float     playfieldHalfWidth  = 2.6f;
         constexpr float     playfieldHalfHeight = 3.0f;
@@ -95,16 +90,7 @@ protected:
         constexpr float     brickSideMargin     = 0.18f;
 
         // --- Ball ---
-        ball = PhysicsEngine::spawn<PhysicsObject>(std::make_shared<Sphere>(), rp3d::BodyType::DYNAMIC);
-        ball->scale = glm::vec3(ballRadius * 2.5f);
-        ball->addCollider(PhysicsEngine::physicsCommon.createSphereShape(ballRadius));
-        ball->setMaterialProperties(1.0f, 0.0f, 1.0f);
-        ball->getRigidBody()->enableGravity(false);
-        ball->getRigidBody()->setLinearLockAxisFactor(rp3d::Vector3(1, 1, 0));
-        ball->getRigidBody()->setAngularLockAxisFactor(rp3d::Vector3(0, 0, 1));
-        ball->setPosition(0.0f, -1.0f, 0.0f);
-        ball->getRigidBody()->setLinearVelocity(rp3d::Vector3(0, m_ballSpeed, 0));
-        ball->setTexture(&brickTexture);
+        ball = PhysicsEngine::spawn<Ball>(ballRadius);
 
         // --- Paddle ---
         paddle = PhysicsEngine::spawn<PhysicsObject>(std::make_shared<Cube>(), rp3d::BodyType::STATIC);
@@ -117,7 +103,7 @@ protected:
             if(other == nullptr) return;
             if(other->getRigidBody() == nullptr) return;
             if(self == nullptr) return;
-
+            
             // Calculate the offset based on the collision point
             rp3d::Vector3 collisionPoint = other->getRigidBody()->getTransform().getPosition();
             rp3d::Vector3 paddlePosition = self->getRigidBody()->getTransform().getPosition();
@@ -132,6 +118,12 @@ protected:
             newVelocity *= speed; // Maintain the original speed
 
             other->getRigidBody()->setLinearVelocity(newVelocity);
+
+            // Check if the other object is a PowerUp
+            if (dynamic_cast<PowerUp*>(other)) {
+                // Trigger the PowerUp effect
+                static_cast<PowerUp*>(other)->onHitEffect();
+            }
         });
 
         // --- Walls ---
@@ -149,7 +141,17 @@ protected:
         
         auto bottomWall = spawnWall({0, -playfieldHalfHeight, 0}, {playfieldHalfWidth*2, wallThickness, wallDepth});
         bottomWall->onCollisionCallback([this](PhysicsObject* self, PhysicsObject* other){
-            if(other == ball && !freezeUpdate && m_InvulnerabilityTimer <= 0.0) {
+            if(!freezeUpdate && m_InvulnerabilityTimer <= 0.0) {
+                //check if its last ball, if so loses a life and reset the ball and paddle position
+                if(other == nullptr) return;
+                if(other->getRigidBody() == nullptr) return;
+                std::vector<Ball*> balls = PhysicsEngine::getAllBodiesOfType<Ball>();
+                if(balls.size() > 1) {
+                    // If there are multiple balls, just remove the one that hit the bottom wall
+                    other->queue_free();
+                    return;
+                }
+
                 m_InvulnerabilityTimer = 0.5; // Activate invulnerability for 1 second
                 m_Lives--;
 
@@ -157,13 +159,10 @@ protected:
                     freezeUpdate = true; // Game over, freeze the game
                     m_GameWon = false; // Set game won to false
                     m_GameLost = true; // Set game lost to true
-                    ball->getRigidBody()->setLinearVelocity(rp3d::Vector3(0, 0, 0));
-                    ball->getRigidBody()->setAngularVelocity(rp3d::Vector3(0, 0, 0));
-                    ball->setPosition(0.0f, -1.0f, 0.0f);
                 } else {
-                    ball->setPosition(0.0f, -1.0f, 0.0f);
-                    ball->getRigidBody()->setLinearVelocity(rp3d::Vector3(0, m_ballSpeed, 0));
-                    ball->getRigidBody()->setAngularVelocity(rp3d::Vector3(0, 0, 0));
+                    other->setPosition(0.0f, -1.0f, 0.0f);
+                    other->getRigidBody()->setLinearVelocity(rp3d::Vector3(0, m_ballSpeed, 0));
+                    other->getRigidBody()->setAngularVelocity(rp3d::Vector3(0, 0, 0));
                     paddle->setPosition(0.0f, -2.0f, 0.0f);
                 }
             };
@@ -182,12 +181,7 @@ protected:
 
         for(int row = 0; row < brickRows; ++row){
             for(int col = 0; col < brickColumns; ++col){
-                auto* brick = PhysicsEngine::spawn<Brick>(std::make_shared<Cube>(), rp3d::BodyType::STATIC);
-                brick->setTexture(&brickTexture);
-                brick->setScale(glm::vec3(brickWidth, brickHeight, brickDepth));
-                brick->addCollider(PhysicsEngine::physicsCommon.createBoxShape(
-                    rp3d::Vector3(brickWidth*0.5f, brickHeight*0.5f, brickDepth*0.5f)));
-                brick->setMaterialProperties(0.0f, 0.5f, 1.0f);
+                auto* brick = PhysicsEngine::spawn<Brick>(brickWidth, brickHeight, brickDepth);
                 brick->setPosition(
                     startX + col*(brickWidth + hSpacing),
                     startY - row*(brickHeight + vSpacing),
@@ -266,35 +260,24 @@ protected:
         if (m_InvulnerabilityTimer > 0.0) {
             m_InvulnerabilityTimer -= deltaTime;
         }
-
-        if (freezeUpdate) {
-            return; // Skip the update if the game is frozen
-        }
-
-        pointLight->setPosition(ball->getPosition().x, ball->getPosition().y, ball->getPosition().z);
-        const float rotationSpeed = 2.0f; // Adjust this value to control the rotation speed
-        //when ball rotates continuosly the rotation axis is the direction of the velocity
-        ball->setRotation(ball->getRigidBody()->getLinearVelocity().x * rotationSpeed * glfwGetTime(), ball->getRigidBody()->getLinearVelocity().y * rotationSpeed * glfwGetTime(), ball->getRigidBody()->getLinearVelocity().z * rotationSpeed * glfwGetTime());
         bool allBricksDestroyed = std::all_of(bricks.begin(), bricks.end(), [](Brick* b) {
             return !b->visible;
         });
         if (allBricksDestroyed) {
             this->freezeUpdate = true; // Freeze the game
             this->m_GameWon = true; // Set game won to true
-            ball->getRigidBody()->setLinearVelocity(rp3d::Vector3(0, 0, 0));
-            ball->getRigidBody()->setAngularVelocity(rp3d::Vector3(0, 0, 0));
         }
 
         PhysicsEngine::update(static_cast<float>(timePerFrame));
     }
 
     void OnRender() override {
-        for(auto* w : walls)  Renderer::submit(shader.get(), w);
-        for(auto* b : bricks){
-            if(b->visible) Renderer::submit(shader.get(), b);
+
+        for(auto* obj : PhysicsEngine::getAllBodiesOfType<GameObject>()) {
+            if(obj->visible)
+            Renderer::submit(shader.get(), obj);
         }
-        Renderer::submit(shader.get(), ball);
-        Renderer::submit(shader.get(), paddle);
+        
 
         std::string hudText = "SCORE: " + std::to_string(m_Score) + "  LIVES: " + std::to_string(m_Lives);
         textRenderer->RenderText(hudText, 5.0f, m_Window->getHeight() - 20.0f, 0.4f, glm::vec3(1.0, 1.0, 1.0f));

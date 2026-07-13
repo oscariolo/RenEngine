@@ -4,7 +4,7 @@
 
 class Brick : public PhysicsObject {
     public:
-        using PhysicsObject::PhysicsObject; // Inherit constructors from PhysicsObject
+        Brick(float brickWidth, float brickHeight, float brickDepth);
 
     public:
         bool isBeingDestroyed = false;
@@ -16,6 +16,16 @@ class Brick : public PhysicsObject {
         void setScale(const glm::vec3& newScale) {
             originalScale = newScale;
             scale = newScale;
+        }
+    
+    private:
+        static Texture& getSharedTexture() {
+            static Texture texture = [](){
+                Texture t;
+                t.loadTexture("assets/textures/wall.jpg");
+                return t;
+            }();
+            return texture;
         }
 
 

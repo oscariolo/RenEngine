@@ -13,6 +13,17 @@ class PhysicsEngine {
             m_physicsObjects.push_back(std::move(obj));
             return ptr;
         }
+        template<typename T>
+        static std::vector<T*> getAllBodiesOfType() {
+            std::vector<T*> result;
+            for (const auto& obj : m_physicsObjects) {
+                if (T* casted = dynamic_cast<T*>(obj.get())) {
+                    result.push_back(casted);
+                }
+            }
+            return result;
+        }
+
         static void destroy();
         static void init();
         static void update(float deltaTime);

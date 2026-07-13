@@ -2,6 +2,7 @@
 #include "GameObject.h"
 #include <glad/glad.h>
 #include "utils/Projections.h"
+#include <iostream>
 
 //Renderer va a considerar la camara
 //aplicar shaders a objetos que se determinen

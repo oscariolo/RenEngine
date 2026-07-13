@@ -1,5 +1,13 @@
 #include "Brick.h"
+#include "physics/PhysicsEngine.h"
 
+Brick::Brick(float brickWidth, float brickHeight, float brickDepth) : PhysicsObject(std::make_shared<Cube>(), rp3d::BodyType::STATIC) {
+    setTexture(&getSharedTexture());
+    addCollider(PhysicsEngine::physicsCommon.createBoxShape(
+        rp3d::Vector3(brickWidth * 0.5f, brickHeight * 0.5f, brickDepth * 0.5f)));
+    setScale(glm::vec3(brickWidth, brickHeight, brickDepth));
+    setMaterialProperties(0.0f, 0.5f, 1.0f);
+}
 
 void Brick::killBrick() {
     if (!isBeingDestroyed) {

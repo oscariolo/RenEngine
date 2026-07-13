@@ -10,6 +10,16 @@ PhysicsObject::PhysicsObject(const std::shared_ptr<Mesh>& mesh, rp3d::BodyType t
     m_RigidBody->setType(type);
 };
 
+PhysicsObject::PhysicsObject(rp3d::BodyType type) : GameObject() {
+    rp3d::Vector3 position(this->position.x, this->position.y, this->position.z);
+    rp3d::Quaternion orientation = rp3d::Quaternion::identity();
+    rp3d::Transform transform(position, orientation);
+    m_RigidBody = PhysicsEngine::createRigidBody(transform);
+    m_RigidBody->setUserData(this);
+    m_RigidBody->setType(type);
+};
+
+
 PhysicsObject::~PhysicsObject() {
     
 }
@@ -58,9 +68,19 @@ void PhysicsObject::setRotation(float x, float y, float z){
     m_RigidBody->setTransform(currentTransform);
 }
 
-void PhysicsObject::addCollider(rp3d::CollisionShape* collisionShape){
+void PhysicsObject::addCollider(rp3d::CollisionShape* collisionShape, int collisionGroup){
     rp3d::Transform transform = rp3d::Transform::identity();
     m_collider = m_RigidBody->addCollider(collisionShape,transform);
+    m_collider->setCollisionCategoryBits(collisionGroup);
+    m_collider->setCollideWithMaskBits(collisionGroup); // Collide with its collisionGroup only by default
+}
+
+void PhysicsObject::addCollisionLayer(int collisionGroup){
+    if(m_collider){
+        unsigned short currentMask = m_collider->getCollideWithMaskBits();
+        currentMask |= collisionGroup; // Add the new group to the mask
+        m_collider->setCollideWithMaskBits(currentMask);
+    }
 }
 
 void PhysicsObject::setMaterialProperties(float bounciness, float frictionCoefficient, float massDensity){
