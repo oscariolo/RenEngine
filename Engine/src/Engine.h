@@ -5,3 +5,4 @@
 #include "renderer/Sphere.h"
 #include "renderer/Camera.h"
 #include "renderer/PhysicsObject.h"
+#include "core/AudioPlayer.h"
