@@ -189,7 +189,8 @@ protected:
         if(freezeUpdate && m_Window->isKeyPressed(GLFW_KEY_R)){
             freezeUpdate = false;
             ball->setPosition(0.0f, -1.0f, 0.0f);
-            ball->getRigidBody()->setLinearVelocity(rp3d::Vector3(0, 4.0f, 0));
+            ball->getRigidBody()->setLinearVelocity(rp3d::Vector3(0, -4.0f, 0));
+            paddle->setPosition(0.0f, -2.0f, 0.0f);
             for(auto* b : bricks){
                 b->reset();
             }

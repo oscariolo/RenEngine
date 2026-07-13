@@ -28,9 +28,9 @@ void Application::Run() {
         }
 
         // 2. Fijo a FPS 
-        accumulator += deltaTime;
         OnInput();
         if(!freezeUpdate){
+            accumulator += deltaTime;
             if (accumulator >= timePerFrame) {
                 OnUpdate(timePerFrame); //
                 accumulator -= timePerFrame;
