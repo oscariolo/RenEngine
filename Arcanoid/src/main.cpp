@@ -21,6 +21,7 @@ private:
     int m_Score = 0;
     int m_Lives = 3;
     bool m_GameWon = false;
+    bool m_GameLost = false;
     double m_InvulnerabilityTimer = 0.0;
 
     double m_Accumulator = 0.0;
@@ -83,8 +84,8 @@ protected:
         constexpr float     playfieldHalfHeight = 3.0f;
         constexpr float     wallThickness       = 0.12f;
         constexpr float     wallDepth           = 0.35f;
-        constexpr int       brickColumns        = 1;
-        constexpr int       brickRows           = 1;
+        constexpr int       brickColumns        = 8;
+        constexpr int       brickRows           = 5;
         constexpr float     brickWidth          = 0.3f;
         constexpr float     brickHeight         = 0.2f;
         constexpr float     brickDepth          = 0.3f;
@@ -155,6 +156,7 @@ protected:
                 if(m_Lives <= 0){
                     freezeUpdate = true; // Game over, freeze the game
                     m_GameWon = false; // Set game won to false
+                    m_GameLost = true; // Set game lost to true
                     ball->getRigidBody()->setLinearVelocity(rp3d::Vector3(0, 0, 0));
                     ball->getRigidBody()->setAngularVelocity(rp3d::Vector3(0, 0, 0));
                     ball->setPosition(0.0f, -1.0f, 0.0f);
@@ -240,6 +242,7 @@ protected:
         if(freezeUpdate && m_Window->isKeyPressed(GLFW_KEY_R)){
             freezeUpdate = false;
             m_GameWon = false;
+            m_GameLost = false;
             m_Score = 0;
             m_Lives = 3;
             m_InvulnerabilityTimer = 0.3;
@@ -296,7 +299,7 @@ protected:
         std::string hudText = "SCORE: " + std::to_string(m_Score) + "  LIVES: " + std::to_string(m_Lives);
         textRenderer->RenderText(hudText, 5.0f, m_Window->getHeight() - 20.0f, 0.4f, glm::vec3(1.0, 1.0, 1.0f));
 
-        if (this->m_GameWon) {
+        if (m_GameWon || m_GameLost) {
             const float windowWidth = static_cast<float>(m_Window->getWidth());
             const float windowHeight = static_cast<float>(m_Window->getHeight());
 
