@@ -38,6 +38,7 @@ private:
     std::vector<Brick*> bricks;
     std::vector<PhysicsObject*> walls;
     const float  ballRadius          = 0.25f;
+    Texture paddleTexture;
 
 public:
     ~SandboxApp()
@@ -98,6 +99,8 @@ protected:
             rp3d::Vector3(paddleScale.x * 0.5f, paddleScale.y * 0.5f, paddleScale.z * 0.5f)));
         paddle->setMaterialProperties(0.0f, 0.0f, 1.0f);
         paddle->setPosition(0.0f, -2.0f, 0.0f);
+        paddleTexture.loadTexture("assets/textures/paddle.png");
+        paddle->setTexture(&paddleTexture); // Use the loaded texture
         paddle->onCollisionCallback([](PhysicsObject* self, PhysicsObject* other){
             if(other == nullptr) return;
             if(other->getRigidBody() == nullptr) return;

@@ -13,9 +13,9 @@ Brick::Brick(float brickWidth, float brickHeight, float brickDepth, int hitPoint
 
 glm::vec3 Brick::GetColorForHitPoints(int hitPoints) {
     switch (hitPoints) {
-        case 3: return glm::vec3(0.5f, 0.0f, 0.5f); // Purple
-        case 2: return glm::vec3(0.0f, 0.0f, 1.0f); // Blue
-        case 1: return glm::vec3(1.0f, 0.0f, 0.0f); // Red
+        case 3: return glm::vec3(1.0f, 0.5f, 0.0f); 
+        case 2: return glm::vec3(1.0f, 1.0f, 0.0f); // Blue
+        case 1: return glm::vec3(0.0f, 1.0f, 1.0f); // Red
         default: return glm::vec3(1.0f, 1.0f, 1.0f); // White for any other case
     }
 }
