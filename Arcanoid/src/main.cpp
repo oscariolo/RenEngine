@@ -185,22 +185,37 @@ protected:
 
         for(int row = 0; row < brickRows; ++row){
             for(int col = 0; col < brickColumns; ++col){
-                auto* brick = PhysicsEngine::spawn<Brick>(brickWidth, brickHeight, brickDepth);
+
+                int hitPoints;
+                if (row < 2) {
+                    hitPoints = 3; // Top two rows have 3 hit points
+                } else if (row < 5) {
+                    hitPoints = 2; // Next three rows have 2 hit points
+                } else {
+                    hitPoints = 1; // Bottom three rows have 1 hit point
+                }
+
+                auto* brick = PhysicsEngine::spawn<Brick>(brickWidth, brickHeight, brickDepth, hitPoints);
                 brick->setPosition(
                     startX + col*(brickWidth + hSpacing),
                     startY - row*(brickHeight + vSpacing),
                     0.0f);
                 brick->onCollisionCallback([this](PhysicsObject* self, PhysicsObject*){
                     Brick* brickPtr = static_cast<Brick*>(self);
+
                     if (brickPtr->visible) {
-                        brickPtr->killBrick();
-                        this->m_Score++; 
-                    }
-                    //random spawn
-                    if(rand() % 100 < 5) // 5% chance to spawn a DoubleBall power-up
-                    {
-                        auto* doubleBall = PhysicsEngine::spawn<DoubleBall>();
-                        doubleBall->setPosition(brickPtr->getPosition());
+                        bool wasDestroyed = brickPtr->hit();
+                        if (wasDestroyed) {
+                            this->m_Score++;
+                            //random spawn
+                            if(rand() % 100 < 5) // 5% chance to spawn a DoubleBall power-up
+                            {
+                                auto* doubleBall = PhysicsEngine::spawn<DoubleBall>();
+                                doubleBall->setPosition(brickPtr->getPosition());
+                            }
+                        }
+                        // brickPtr->killBrick();
+                        // this->m_Score++; 
                     }
                     audioPlayer.playSound("assets/sounds/pong.mpeg");
                 });

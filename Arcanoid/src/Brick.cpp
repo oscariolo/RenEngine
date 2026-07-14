@@ -1,13 +1,44 @@
 #include "Brick.h"
 #include "physics/PhysicsEngine.h"
 
-Brick::Brick(float brickWidth, float brickHeight, float brickDepth) : PhysicsObject(std::make_shared<Cube>(), rp3d::BodyType::STATIC) {
-    setTexture(&getSharedTexture());
+Brick::Brick(float brickWidth, float brickHeight, float brickDepth, int hitPoints) : PhysicsObject(std::make_shared<Cube>(), rp3d::BodyType::STATIC), maxHitPoints(hitPoints), currentHitPoints(hitPoints) {
+    setTexture(&getSharedTexture()); 
     addCollider(PhysicsEngine::physicsCommon.createBoxShape(
         rp3d::Vector3(brickWidth * 0.5f, brickHeight * 0.5f, brickDepth * 0.5f)));
     setScale(glm::vec3(brickWidth, brickHeight, brickDepth));
     setMaterialProperties(0.0f, 0.5f, 1.0f);
     uniformColor = glm::vec3(0.5f, 0.5f, 0.5f); // Red color for the brick
+    UpdateColor();
+}
+
+glm::vec3 Brick::GetColorForHitPoints(int hitPoints) {
+    switch (hitPoints) {
+        case 3: return glm::vec3(0.5f, 0.0f, 0.5f); // Purple
+        case 2: return glm::vec3(0.0f, 0.0f, 1.0f); // Blue
+        case 1: return glm::vec3(1.0f, 0.0f, 0.0f); // Red
+        default: return glm::vec3(1.0f, 1.0f, 1.0f); // White for any other case
+    }
+}
+
+void Brick::UpdateColor() {
+    uniformColor = GetColorForHitPoints(currentHitPoints);
+}
+
+bool Brick::hit() {
+    if (isBeingDestroyed || hitCooldown > 0.0f) {
+        return false;
+    }
+
+    hitCooldown = 0.1f; // Set cooldown time (in seconds)
+    currentHitPoints--;
+
+    if (currentHitPoints <= 0) {
+        killBrick();
+        return true; // Brick destroyed
+    }
+
+    UpdateColor(); // Update color based on remaining hit points
+    return false; // Brick still alive
 }
 
 void Brick::killBrick() {
@@ -20,14 +51,25 @@ void Brick::killBrick() {
 void Brick::reset() {
     isBeingDestroyed = false;
     destructionTimer = 0.0f;
+    currentHitPoints = maxHitPoints; // Reset hit points
+    hitCooldown = 0.0f; // Reset cooldown
     scale = glm::vec3(1.0f, 1.0f, 1.0f); // Reset scale to original
     getRigidBody()->setIsActive(true);
     visible = true;
     setScale(originalScale); // Reset to original scale
+    UpdateColor(); // Reset color based on hit points
 }
 
 void Brick::update(){
     PhysicsObject::update(); // Call the base class update to sync position with physics
+
+    if (hitCooldown > 0.0f) {
+        hitCooldown -= 1.0f / 60.0f; // Assuming update is called at 60 FPS
+        if (hitCooldown < 0.0f) {
+            hitCooldown = 0.0f;
+        }
+    }
+
     if(isBeingDestroyed){
         getRigidBody()->setIsActive(false);
         destructionTimer += 1.0f/60.0f; // Assuming update is called at 60 FPS
